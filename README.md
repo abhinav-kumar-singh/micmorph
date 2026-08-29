@@ -1,7 +1,7 @@
 <div align="center">
   <img src="landing/logo.png" width="100" height="100" alt="MicMorph Logo" style="border-radius: 22px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);" />
   <h1>MicMorph</h1>
-  <p><strong>Real-time voice pitch tuning for macOS. Sound deeper, bolder, and more confident on every call.</strong></p>
+  <p><strong>Real-time voice pitch tuning for macOS &amp; Windows. Sound deeper, bolder, and more confident on every call.</strong></p>
 
   <p>
     <a href="#features">Features</a> •
@@ -13,9 +13,9 @@
   </p>
 
   <p>
-    <img src="https://img.shields.io/badge/Platform-macOS%20(Apple%20Silicon%20%26%20Intel)-orange?style=flat-square&logo=apple" alt="Platform" />
+    <img src="https://img.shields.io/badge/Platform-macOS%20%7C%20Windows%2010%2F11-orange?style=flat-square" alt="Platform" />
     <img src="https://img.shields.io/badge/Built%20With-Tauri%20v2%20%2B%20Rust-red?style=flat-square&logo=rust" alt="Tech" />
-    <img src="https://img.shields.io/badge/Audio%20DSP-SoundTouch%20CoreAudio-blue?style=flat-square" alt="Audio DSP" />
+    <img src="https://img.shields.io/badge/Audio%20DSP-SoundTouch%20%2B%20CoreAudio%2FWASAPI-blue?style=flat-square" alt="Audio DSP" />
     <img src="https://img.shields.io/badge/Privacy-100%25%20On--Device%20Local-emerald?style=flat-square" alt="Privacy" />
     <img src="https://img.shields.io/badge/License-MIT-purple?style=flat-square" alt="License" />
   </p>
@@ -25,13 +25,13 @@
 
 ## 🎙️ Overview
 
-**MicMorph** is a lightweight, zero-latency macOS utility that transforms your microphone voice in real time during live calls. Whether you are presenting in **Google Meet**, hosting in **Zoom**, chatting in **Slack Huddles**, or streaming via **OBS**, MicMorph processes your voice directly on your device with natural acoustic preservation.
+**MicMorph** is a lightweight, zero-latency desktop utility that transforms your microphone voice in real time during live calls on **macOS** and **Windows 10/11**. Whether you are presenting in **Google Meet**, hosting in **Zoom**, chatting in **Slack Huddles**, or streaming via **OBS**, MicMorph processes your voice directly on your device with natural acoustic preservation.
 
 ---
 
 ## ✨ Features
 
-- **⚡ Zero-Latency Real-Time DSP**: Pitch shifting powered by **SoundTouch DSP** and native macOS **CoreAudio** threads.
+- **⚡ Zero-Latency Real-Time DSP**: Pitch shifting powered by **SoundTouch DSP** with native **CoreAudio** (macOS) and **WASAPI** (Windows) low-latency streams.
 - **🎛️ 5 Instant Voice Presets**:
   - `Subtle (-1 st)` — Gentle richness and presence
   - `Medium (-3 st)` — Authoritative, balanced pitch
@@ -39,8 +39,8 @@
   - `Deepest (-8 st)` — Deep acoustic voice
   - `Natural (0 st)` — Clean bypass mode
 - **🎧 Live Voice Preview**: Listen to your pitch-shifted voice in real time through your headphones before joining calls.
-- **📌 Native macOS Menu Bar Tray**: Switch voice presets with 1 click directly from your menu bar without opening the main window.
-- **🔒 100% On-Device Privacy**: No servers, no cloud APIs, no audio recording. Your voice never leaves your Mac.
+- **📌 Native System Tray Control**: Switch voice presets with 1 click directly from your macOS Menu Bar or Windows Taskbar without opening the main window.
+- **🔒 100% On-Device Privacy**: No servers, no cloud APIs, no audio recording. Your voice never leaves your machine.
 - **🪶 Ultra Lightweight**: ~2.3 MB package size, <2% CPU utilization.
 
 ---

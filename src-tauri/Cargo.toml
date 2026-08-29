@@ -29,7 +29,7 @@ parking_lot = "0.12"
 # Date and time calculations
 chrono = { version = "0.4", features = ["serde"] }
 
-# macOS CoreFoundation helper
+[target.'cfg(target_os = "macos")'.dependencies]
 core-foundation = "0.9"
 
 # Logging

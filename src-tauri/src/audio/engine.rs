@@ -91,8 +91,15 @@ impl AudioEngine {
         let output_device = host
             .output_devices()
             .map_err(|e| format!("Cannot enumerate output devices: {}", e))?
-            .find(|d| d.name().map(|n| n.to_lowercase().contains("blackhole")).unwrap_or(false))
-            .ok_or_else(|| "BlackHole 2ch not found. Please install it with: brew install blackhole-2ch".to_string())?;
+            .find(|d| d.name().map(|n| crate::audio::devices::is_virtual_device_name(&n)).unwrap_or(false))
+            .ok_or_else(|| {
+                #[cfg(target_os = "macos")]
+                return "BlackHole 2ch not found. Please install it with: brew install blackhole-2ch".to_string();
+                #[cfg(target_os = "windows")]
+                return "VB-CABLE Virtual Audio Device not found. Please install VB-CABLE Driver.".to_string();
+                #[cfg(not(any(target_os = "macos", target_os = "windows")))]
+                return "Virtual audio cable driver not found.".to_string();
+            })?;
 
         log::info!("Output device: {}", output_device.name().unwrap_or_default());
 

@@ -54,7 +54,7 @@ fn main() {
                 loop {
                     std::thread::sleep(std::time::Duration::from_secs(3));
                     
-                    let active = crate::audio::mac_usage::is_micmorph_device_active();
+                    let active = crate::audio::is_micmorph_device_active();
                     if active != last_active {
                         last_active = active;
                         log::info!("MicMorph device activity changed: active = {}", active);

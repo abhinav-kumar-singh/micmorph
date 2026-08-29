@@ -10,8 +10,18 @@ pub struct AudioDevice {
     pub is_blackhole: bool,
 }
 
-/// Returns a list of all available audio INPUT devices on this Mac.
-/// Flags BlackHole 2ch if detected.
+pub fn is_virtual_device_name(name: &str) -> bool {
+    let lower = name.to_lowercase();
+    lower.contains("blackhole")
+        || lower.contains("cable input")
+        || lower.contains("cable output")
+        || lower.contains("vb-audio")
+        || lower.contains("virtual audio")
+        || lower.contains("micmorph")
+}
+
+/// Returns a list of all available audio INPUT devices on this system.
+/// Flags virtual bridge devices (BlackHole on macOS, VB-CABLE on Windows).
 pub fn list_input_devices() -> Vec<AudioDevice> {
     let host = cpal::default_host();
 
@@ -19,7 +29,7 @@ pub fn list_input_devices() -> Vec<AudioDevice> {
         Ok(devices) => devices
             .filter_map(|d| {
                 d.name().ok().map(|name| {
-                    let is_blackhole = name.to_lowercase().contains("blackhole");
+                    let is_blackhole = is_virtual_device_name(&name);
                     AudioDevice { name, is_blackhole }
                 })
             })
@@ -31,8 +41,8 @@ pub fn list_input_devices() -> Vec<AudioDevice> {
     }
 }
 
-/// Returns a list of all available audio OUTPUT devices on this Mac.
-/// Used to find BlackHole 2ch as the output/virtual mic target.
+/// Returns a list of all available audio OUTPUT devices on this system.
+/// Used to find BlackHole (macOS) or VB-CABLE (Windows) as the virtual mic stream target.
 pub fn list_output_devices() -> Vec<AudioDevice> {
     let host = cpal::default_host();
 
@@ -40,7 +50,7 @@ pub fn list_output_devices() -> Vec<AudioDevice> {
         Ok(devices) => devices
             .filter_map(|d| {
                 d.name().ok().map(|name| {
-                    let is_blackhole = name.to_lowercase().contains("blackhole");
+                    let is_blackhole = is_virtual_device_name(&name);
                     AudioDevice { name, is_blackhole }
                 })
             })
@@ -52,7 +62,7 @@ pub fn list_output_devices() -> Vec<AudioDevice> {
     }
 }
 
-/// Checks if BlackHole 2ch is installed and detectable as an output device.
+/// Checks if a virtual audio cable (BlackHole on macOS or VB-CABLE on Windows) is available.
 pub fn is_blackhole_available() -> bool {
     list_output_devices()
         .iter()

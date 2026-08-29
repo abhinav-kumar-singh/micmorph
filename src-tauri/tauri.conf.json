@@ -41,6 +41,11 @@
       "entitlements": "entitlements.plist",
       "signingIdentity": null,
       "minimumSystemVersion": "10.15"
+    },
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser"
+      }
     }
   }
 }

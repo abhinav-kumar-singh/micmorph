@@ -1,5 +1,7 @@
 // audio/mac_usage.rs — Native CoreAudio helper to detect if MicMorph virtual mic is active
 
+#![cfg(target_os = "macos")]
+
 use std::ffi::c_void;
 use std::ptr;
 use core_foundation::string::{CFString, CFStringRef};

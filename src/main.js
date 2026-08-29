@@ -150,8 +150,29 @@ function updateUsageUI(status) {
 function showScreen(name) {
   screenOnboarding.classList.add('hidden');
   screenMain.classList.add('hidden');
-  if (name === 'onboarding') screenOnboarding.classList.remove('hidden');
-  else screenMain.classList.remove('hidden');
+  if (name === 'onboarding') {
+    const isWindows = navigator.userAgent.includes('Windows') || (navigator.platform && navigator.platform.includes('Win'));
+    if (isWindows) {
+      const onboardTitle = document.querySelector('#screen-onboarding h1');
+      const step1Title = document.querySelector('.setup-step:nth-child(1) h3');
+      const step1Desc = document.querySelector('.setup-step:nth-child(1) p');
+      const codeBlock = document.querySelector('.code-block');
+      const step2Title = document.querySelector('.setup-step:nth-child(2) h3');
+      const step2Desc = document.querySelector('.setup-step:nth-child(2) p');
+
+      if (onboardTitle) onboardTitle.textContent = 'Welcome to MicMorph';
+      if (step1Title) step1Title.textContent = 'Install VB-Audio Virtual Cable';
+      if (step1Desc) step1Desc.textContent = 'VB-Audio Cable is a free, trusted virtual audio driver for Windows. MicMorph uses it to route your voice to Zoom, Meet, Teams, and Discord.';
+      if (codeBlock) {
+        codeBlock.innerHTML = `<a href="https://download.vb-audio.com/Download_CABLE/VBCABLE_Driver_Pack43.zip" target="_blank" style="color:var(--accent); font-weight:600; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">📥 Download Free Driver (ZIP)</a>`;
+      }
+      if (step2Title) step2Title.textContent = 'Extract & Run Setup';
+      if (step2Desc) step2Desc.textContent = 'Right-click VBCABLE_Setup_x64.exe and select "Run as Administrator", then restart your PC.';
+    }
+    screenOnboarding.classList.remove('hidden');
+  } else {
+    screenMain.classList.remove('hidden');
+  }
 }
 
 // ── Onboarding ────────────────────────────────────────────────────────────────
@@ -162,7 +183,8 @@ btnCheckBlackhole?.addEventListener('click', async () => {
     const ok = await invoke('check_blackhole');
     if (ok) { showScreen('main'); await loadDevices(); startWaveformAnimation(); }
     else {
-      btnCheckBlackhole.textContent = '✗ Not detected — restart your Mac first';
+      const isWindows = navigator.userAgent.includes('Windows') || (navigator.platform && navigator.platform.includes('Win'));
+      btnCheckBlackhole.textContent = isWindows ? '✗ Not detected — restart your PC first' : '✗ Not detected — restart your Mac first';
       setTimeout(() => { btnCheckBlackhole.textContent = '✓ I\'ve Installed It — Check Now'; btnCheckBlackhole.disabled = false; }, 3000);
     }
   } catch { btnCheckBlackhole.textContent = '✓ I\'ve Installed It — Check Now'; btnCheckBlackhole.disabled = false; }

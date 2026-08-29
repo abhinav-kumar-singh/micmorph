@@ -1526,11 +1526,11 @@
         </div>
         <div class="faq-item">
           <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-            What about Windows or Linux?
+            Does it work on Windows and Mac?
             <span class="faq-icon">+</span>
           </button>
           <div class="faq-answer">
-            <p>MicMorph is currently macOS-only. Windows and Linux support is on our roadmap. Sign up for updates and we'll let you know when it's ready!</p>
+            <p>Yes! MicMorph supports both macOS (Apple Silicon &amp; Intel) and Windows 10/11 (64-bit). On macOS it uses BlackHole, and on Windows it uses VB-Audio Virtual Cable. Both run 100% locally with zero latency.</p>
           </div>
         </div>
         <div class="faq-item">
@@ -1704,6 +1704,23 @@
     }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
 
     revealEls.forEach(el => observer.observe(el));
+
+    // ── OS Detection for Download Buttons ──────────────────────────────────
+    const isWindows = /Win/i.test(navigator.userAgent || navigator.platform);
+    if (isWindows) {
+      document.querySelectorAll('.btn-primary, .btn-plan').forEach(btn => {
+        if (btn.hasAttribute('download') || btn.textContent.includes('Download')) {
+          const appleIcon = btn.querySelector('.apple-icon');
+          if (appleIcon) {
+            appleIcon.outerHTML = '<span style="font-size:1.1rem; margin-right:4px; display:inline-block; vertical-align:middle;">⊞</span>';
+          }
+          if (btn.textContent.includes('macOS')) {
+            btn.innerHTML = btn.innerHTML.replace('macOS', 'Windows (64-bit)');
+          }
+          btn.setAttribute('href', 'MicMorph_0.1.0_x64-setup.exe');
+        }
+      });
+    }
   </script>
 </body>
 </html>
