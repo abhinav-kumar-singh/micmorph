@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — MicMorph</title>
+  <meta name="description" content="MicMorph Privacy Policy. 100% on-device local voice processing. Zero data collection.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg-deep: #07070d;
+      --bg-card: rgba(255,255,255,0.04);
+      --border-card: rgba(255,255,255,0.08);
+      --accent: #f97316;
+      --accent-glow: rgba(249,115,22,0.15);
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    [data-theme="light"] {
+      --bg-deep: #fbfbfe;
+      --bg-card: rgba(0,0,0,0.02);
+      --border-card: rgba(0,0,0,0.08);
+      --accent: #ea580c;
+      --accent-glow: rgba(234,88,12,0.08);
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+    }
+    body {
+      font-family: var(--font);
+      background: var(--bg-deep);
+      color: var(--text-primary);
+      line-height: 1.7;
+      padding: 0;
+      margin: 0;
+    }
+    .nav {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border-card);
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    .nav .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+    .brand img {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+    }
+    .back-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .back-link:hover { text-decoration: underline; }
+    .content {
+      padding: 60px 0 100px;
+    }
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+    }
+    .last-updated {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 40px;
+    }
+    .summary-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-left: 4px solid var(--accent);
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 40px;
+    }
+    .summary-card h3 {
+      color: var(--accent);
+      font-size: 1.1rem;
+      margin-bottom: 6px;
+    }
+    .summary-card p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+    h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin: 36px 0 14px;
+      color: var(--text-primary);
+    }
+    p {
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+      font-size: 1rem;
+    }
+    ul {
+      margin-left: 20px;
+      margin-bottom: 20px;
+      color: var(--text-secondary);
+    }
+    li {
+      margin-bottom: 8px;
+    }
+    footer {
+      border-top: 1px solid var(--border-card);
+      padding: 30px 0;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="container">
+      <a href="index.html" class="brand">
+        <img src="logo.png" alt="MicMorph Logo">
+        MicMorph
+      </a>
+      <a href="index.html" class="back-link">← Back to Home</a>
+    </div>
+  </nav>
+
+  <main class="content">
+    <div class="container">
+      <h1>Privacy Policy</h1>
+      <div class="last-updated">Last Updated: August 30, 2026</div>
+
+      <div class="summary-card">
+        <h3>🛡️ Plain English Summary</h3>
+        <p>MicMorph processes 100% of your audio locally on your Mac in real time. We do not record, store, transmit, or analyze your voice. Your audio never leaves your computer.</p>
+      </div>
+
+      <h2>1. Information We Do Not Collect</h2>
+      <p>Your privacy is the core architectural principle of MicMorph:</p>
+      <ul>
+        <li><strong>No Audio Streaming:</strong> Your microphone input and processed audio are never sent to external servers or cloud services.</li>
+        <li><strong>No Voice Recording:</strong> MicMorph does not save audio files or voice prints to disk.</li>
+        <li><strong>No Account Required:</strong> You can download and use MicMorph completely anonymously without creating an account or providing an email address.</li>
+        <li><strong>No Third-Party Analytics:</strong> We do not embed trackers, advertising SDKs, or third-party behavioral analytics in the app.</li>
+      </ul>
+
+      <h2>2. Information Stored Locally on Your Mac</h2>
+      <p>MicMorph stores a minimal configuration file locally on your device in your user directory (<code>~/Library/Application Support/com.micmorph.desktop/</code>). This file contains only:</p>
+      <ul>
+        <li>Your last selected voice preset (e.g., Subtle, Medium, Deep, Deepest).</li>
+        <li>Your chosen input microphone device name.</li>
+        <li>A daily usage counter to track your daily free time limit (resets every 24 hours).</li>
+      </ul>
+      <p>This data is strictly local and is never uploaded anywhere.</p>
+
+      <h2>3. Third-Party Virtual Audio Driver (BlackHole)</h2>
+      <p>MicMorph utilizes BlackHole, an open-source virtual audio driver created by Existential Audio Inc., to route audio between applications on macOS. BlackHole runs locally on your Mac kernel and does not connect to the internet or collect any data.</p>
+
+      <h2>4. Changes to this Privacy Policy</h2>
+      <p>We may update our Privacy Policy from time to time. Any changes will be posted on this page with an updated revision date.</p>
+
+      <h2>5. Contact Us</h2>
+      <p>If you have any questions or feedback regarding this Privacy Policy, you can reach us via our official GitHub repository: <a href="https://github.com/abhinav-kumar-singh/micmorph" style="color: var(--accent);">github.com/abhinav-kumar-singh/micmorph</a>.</p>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      © 2026 MicMorph. All rights reserved.
+    </div>
+  </footer>
+</body>
+</html>

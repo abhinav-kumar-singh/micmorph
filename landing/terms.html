@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terms of Service — MicMorph</title>
+  <meta name="description" content="MicMorph Terms of Service, Trademark Disclaimers, and Open-Source Licensing Attributions.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg-deep: #07070d;
+      --bg-card: rgba(255,255,255,0.04);
+      --border-card: rgba(255,255,255,0.08);
+      --accent: #f97316;
+      --accent-glow: rgba(249,115,22,0.15);
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    [data-theme="light"] {
+      --bg-deep: #fbfbfe;
+      --bg-card: rgba(0,0,0,0.02);
+      --border-card: rgba(0,0,0,0.08);
+      --accent: #ea580c;
+      --accent-glow: rgba(234,88,12,0.08);
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+    }
+    body {
+      font-family: var(--font);
+      background: var(--bg-deep);
+      color: var(--text-primary);
+      line-height: 1.7;
+      padding: 0;
+      margin: 0;
+    }
+    .nav {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border-card);
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    .nav .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+    .brand img {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+    }
+    .back-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .back-link:hover { text-decoration: underline; }
+    .content {
+      padding: 60px 0 100px;
+    }
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+    }
+    .last-updated {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 40px;
+    }
+    .legal-alert {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-left: 4px solid #3b82f6;
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 36px;
+    }
+    .legal-alert h3 {
+      color: #60a5fa;
+      font-size: 1.05rem;
+      margin-bottom: 6px;
+    }
+    .legal-alert p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      margin-bottom: 0;
+    }
+    h2 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin: 36px 0 14px;
+      color: var(--text-primary);
+    }
+    p {
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+      font-size: 0.98rem;
+    }
+    ul {
+      margin-left: 20px;
+      margin-bottom: 20px;
+      color: var(--text-secondary);
+    }
+    li {
+      margin-bottom: 8px;
+    }
+    .code-box {
+      background: rgba(0,0,0,0.3);
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 0.85rem;
+      color: #e2e8f0;
+      margin-bottom: 16px;
+    }
+    footer {
+      border-top: 1px solid var(--border-card);
+      padding: 30px 0;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="container">
+      <a href="index.html" class="brand">
+        <img src="logo.png" alt="MicMorph Logo">
+        MicMorph
+      </a>
+      <a href="index.html" class="back-link">← Back to Home</a>
+    </div>
+  </nav>
+
+  <main class="content">
+    <div class="container">
+      <h1>Terms of Service &amp; Legal Disclaimers</h1>
+      <div class="last-updated">Last Updated: August 30, 2026</div>
+
+      <div class="legal-alert">
+        <h3>⚖️ Important Notice &amp; Third-Party Disclaimers</h3>
+        <p>MicMorph is an independent third-party software utility. All product names, logos, and brands mentioned on this website are property of their respective owners.</p>
+      </div>
+
+      <h2>1. Acceptance of Terms</h2>
+      <p>By downloading, installing, or using MicMorph ("Software"), you agree to be bound by these Terms of Service. If you do not agree to these terms, do not install or use the Software.</p>
+
+      <h2>2. Trademark &amp; Third-Party Brand Disclaimers</h2>
+      <p>Google Meet, Zoom, Slack, Microsoft Teams, Discord, and OBS Studio are registered trademarks of their respective owners:</p>
+      <ul>
+        <li><strong>Google Meet</strong> is a trademark of Google LLC.</li>
+        <li><strong>Zoom</strong> is a trademark of Zoom Video Communications, Inc.</li>
+        <li><strong>Slack</strong> is a trademark of Slack Technologies, LLC (Salesforce).</li>
+        <li><strong>Microsoft Teams</strong> is a trademark of Microsoft Corporation.</li>
+        <li><strong>Discord</strong> is a trademark of Discord Inc.</li>
+        <li><strong>OBS Studio</strong> is a trademark of the OBS Project.</li>
+        <li><strong>macOS and Apple</strong> are trademarks of Apple Inc.</li>
+      </ul>
+      <p>Use of these trademarks does not imply any affiliation, sponsorship, endorsement, or certification by their respective holders. MicMorph is an independent software application designed to work with standard macOS audio input devices.</p>
+
+      <h2>3. Open-Source Software Attributions</h2>
+      <p>MicMorph utilizes certain open-source software libraries:</p>
+      <ul>
+        <li><strong>BlackHole Virtual Audio Driver:</strong> Created and maintained by Existential Audio Inc., licensed under the GNU General Public License v3.0 (GPLv3). MicMorph does not modify the BlackHole driver binary and directs users to the official distribution.</li>
+        <li><strong>SoundTouch Audio Processing Library:</strong> Developed by Olli Parviainen, licensed under the GNU Lesser General Public License (LGPL v2.1).</li>
+      </ul>
+
+      <h2>4. Acceptable Use Policy</h2>
+      <p>You agree to use MicMorph only for lawful purposes. You shall NOT use MicMorph to:</p>
+      <ul>
+        <li>Engage in fraud, identity theft, impersonation for malicious purposes, or unlawful deceit.</li>
+        <li>Harass, threaten, or violate the legal rights of any person.</li>
+        <li>Circumvent or violate audio recording consent laws in your jurisdiction (including wiretapping and two-party consent statutes).</li>
+      </ul>
+
+      <h2>5. Disclaimer of Warranties ("AS IS")</h2>
+      <p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT.</p>
+      <p>IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+
+      <h2>6. Limitation of Liability</h2>
+      <p>To the maximum extent permitted by applicable law, in no event shall MicMorph or its developers be liable for any direct, indirect, incidental, special, consequential, or punitive damages arising out of or related to your use of the Software.</p>
+
+      <h2>7. Governing Law</h2>
+      <p>These terms shall be governed by and construed in accordance with applicable laws, without regard to its conflict of law provisions.</p>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      © 2026 MicMorph. All rights reserved.
+    </div>
+  </footer>
+</body>
+</html>
