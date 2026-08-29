@@ -1,0 +1,19 @@
+{
+  "name": "micmorph",
+  "version": "0.1.0",
+  "description": "Real-time voice pitch tuning for Mac — sound more confident on every call",
+  "scripts": {
+    "dev:ui": "vite src",
+    "build:ui": "vite build src --emptyOutDir",
+    "tauri": "tauri",
+    "dev": "tauri dev",
+    "build": "tauri build"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.0.0",
+    "vite": "^5.4.21"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.0.0"
+  }
+}

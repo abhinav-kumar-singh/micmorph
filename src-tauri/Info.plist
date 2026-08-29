@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>NSMicrophoneUsageDescription</key>
+  <string>MicMorph needs microphone access to capture and process your voice in real-time during calls.</string>
+  <key>NSAudioInputUsageDescription</key>
+  <string>MicMorph needs audio input access to process your voice pitch in real-time.</string>
+</dict>
+</plist>

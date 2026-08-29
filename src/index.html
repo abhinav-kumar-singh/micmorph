@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MicMorph — Voice Pitch Tuning</title>
+  <meta name="description" content="Real-time voice pitch tuning for Mac. Sound more confident on every call." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ── Onboarding Screen (shown if BlackHole not installed) ──────────── -->
+  <div id="screen-onboarding" class="screen hidden">
+    <div class="onboard-card">
+      <div class="onboard-icon">🎙️</div>
+      <h1>Welcome to MicMorph</h1>
+      <p class="onboard-subtitle">One quick setup step before we begin.</p>
+
+      <div class="setup-step">
+        <div class="step-badge">1</div>
+        <div class="step-content">
+          <h3>Install BlackHole Virtual Mic</h3>
+          <p>BlackHole is a free, trusted virtual audio driver. MicMorph uses it to route your processed voice to Zoom, Meet, and Slack.</p>
+          <div class="code-block">
+            <code id="brew-command">brew install blackhole-2ch</code>
+            <button id="btn-copy-brew" class="btn-copy" title="Copy command">📋</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="setup-step">
+        <div class="step-badge">2</div>
+        <div class="step-content">
+          <h3>Restart Your Mac</h3>
+          <p>After installation, restart to activate the virtual audio driver.</p>
+        </div>
+      </div>
+
+      <div class="setup-step">
+        <div class="step-badge">3</div>
+        <div class="step-content">
+          <h3>Return to MicMorph</h3>
+          <p>Come back and click the button below — we'll detect BlackHole automatically.</p>
+        </div>
+      </div>
+
+      <button id="btn-check-blackhole" class="btn-primary" style="margin-top: 8px;">
+        ✓ I've Installed It — Check Now
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Main App Screen ───────────────────────────────────────────────── -->
+  <div id="screen-main" class="screen hidden">
+
+    <!-- Header -->
+    <header class="app-header">
+      <div class="app-logo">
+        <div class="logo-icon"><img src="assets/logo.png" style="width:24px; height:24px; border-radius:6px; display:block;" alt="MicMorph" /></div>
+        <span class="logo-text">MicMorph</span>
+      </div>
+      <div class="header-badges">
+        <div id="usage-badge" class="usage-badge" title="Remaining free daily usage">
+          ⏳ <span id="usage-time-left">60m remaining</span>
+        </div>
+        <div id="status-badge" class="status-badge status-idle">
+          <span class="status-dot"></span>
+          <span id="status-label">Idle</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Waveform Visualizer -->
+    <div class="waveform-container">
+      <div id="waveform-bars" class="waveform-bars">
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
+    </div>
+
+    <!-- Input Device Selector -->
+    <section class="control-section">
+      <label class="control-label" for="device-select">
+        <span class="label-icon">🎤</span>
+        Input Microphone
+      </label>
+      <div class="select-wrapper">
+        <select id="device-select" class="device-select">
+          <option value="">Loading devices...</option>
+        </select>
+        <span class="select-arrow">▾</span>
+      </div>
+    </section>
+
+    <!-- Target Voice Style -->
+    <section class="control-section">
+      <label class="control-label">
+        <span class="label-icon">👤</span>
+        Target Voice Style
+      </label>
+      <div class="style-segmented-control">
+        <button id="btn-style-male" class="segmented-btn active" data-style="male">
+          <span class="btn-icon">🧔</span> Masculine
+        </button>
+        <button id="btn-style-female" class="segmented-btn" data-style="female">
+          <span class="btn-icon">👩</span> Feminine
+        </button>
+      </div>
+    </section>
+
+    <!-- Pitch Slider -->
+    <section class="control-section">
+      <label class="control-label">
+        <span class="label-icon">🎵</span>
+        Pitch Adjustment
+        <span id="pitch-value-display" class="pitch-badge">-3 st</span>
+      </label>
+
+      <div class="slider-container">
+        <span class="slider-label-left" id="slider-label-left">Natural</span>
+        <div class="slider-track-wrapper">
+          <input
+            type="range"
+            id="pitch-slider"
+            class="pitch-slider"
+            min="-8"
+            max="-1"
+            step="0.5"
+            value="-3"
+          />
+          <div id="slider-fill" class="slider-fill"></div>
+        </div>
+        <span class="slider-label-right" id="slider-label-right">Deepest</span>
+      </div>
+
+      <!-- Preset buttons -->
+      <div class="preset-row" id="preset-row">
+        <button class="preset-btn" data-semitones="-1" id="preset-1">Subtle</button>
+        <button class="preset-btn active" data-semitones="-3" id="preset-2">Medium</button>
+        <button class="preset-btn" data-semitones="-5" id="preset-3">Deep</button>
+        <button class="preset-btn" data-semitones="-8" id="preset-4">Deepest</button>
+      </div>
+    </section>
+
+    <!-- Preview Switch -->
+    <section class="control-section preview-section">
+      <div class="preview-row">
+        <label class="control-label" for="preview-toggle" style="margin-bottom: 0; cursor: pointer; display: flex; align-items: center;">
+          <span class="label-icon">🎧</span>
+          Preview Voice
+        </label>
+        <label class="switch">
+          <input type="checkbox" id="preview-toggle" />
+          <span class="slider-switch"></span>
+        </label>
+      </div>
+      <p class="preview-hint">Hear your morphed voice live in default speakers/headphones</p>
+      <p class="preview-warning">⚠️ Headphones required to avoid feedback echo</p>
+    </section>
+
+    <!-- Limit Warning Card -->
+    <div id="limit-card" class="limit-card hidden">
+      <div class="limit-card-icon">⚠️</div>
+      <div class="limit-card-content">
+        <p class="limit-card-title">Daily Free Limit Reached</p>
+        <p class="limit-card-hint">Morphed voice has fallback to original pitch. Upgrade to Pro for unlimited use.</p>
+      </div>
+    </div>
+
+    <!-- Active Info Card -->
+    <div id="active-card" class="active-card hidden">
+      <div class="active-card-icon">🎙️</div>
+      <div class="active-card-content">
+        <p class="active-card-title">MicMorph Mic is LIVE</p>
+        <p class="active-card-hint">Select <strong>"MicMorph"</strong> as your mic in Zoom, Meet, or Slack settings</p>
+      </div>
+    </div>
+
+    <!-- Main Toggle Button -->
+    <div class="toggle-wrapper">
+      <button id="btn-toggle" class="btn-toggle btn-start">
+        <span class="btn-icon">▶</span>
+        <span id="btn-toggle-label">Start MicMorph</span>
+      </button>
+    </div>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <span>Output device: <strong id="output-device-name">MicMorph</strong></span>
+    </footer>
+
+  </div>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>

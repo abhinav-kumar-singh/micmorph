@@ -1,0 +1,1667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MicMorph — Your Voice, Reinvented</title>
+  <meta name="description" content="Transform your voice in real-time on Google Meet, Zoom & Slack. Sound deeper, bolder, or entirely different — with zero setup.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <style>
+    /* ════════════════════════════════════════════════════════════════════════
+       RESET & BASE
+       ════════════════════════════════════════════════════════════════════════ */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg-deep: #07070d;
+      --bg-card: rgba(255,255,255,0.04);
+      --bg-card-hover: rgba(255,255,255,0.07);
+      --border-card: rgba(255,255,255,0.08);
+      --border-card-hover: rgba(255,255,255,0.15);
+      --purple: #f97316;
+      --blue: #ea580c;
+      --cyan: #fbbf24;
+      --green: #10b981;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --glow-purple: rgba(249,115,22,0.12);
+      --glow-blue: rgba(234,88,12,0.08);
+      --glow-cyan: rgba(251,191,36,0.06);
+      --nav-scrolled-bg: rgba(7,7,13,0.85);
+      --mockup-bg: rgba(15,15,25,0.9);
+      --mockup-shadow: rgba(0,0,0,0.5);
+      --particle-opacity: 1;
+    }
+
+    [data-theme="light"] {
+      --bg-deep: #fbfbfe;
+      --bg-card: rgba(0,0,0,0.03);
+      --bg-card-hover: rgba(0,0,0,0.06);
+      --border-card: rgba(0,0,0,0.08);
+      --border-card-hover: rgba(0,0,0,0.15);
+      --purple: #ea580c;
+      --blue: #c2410c;
+      --cyan: #d97706;
+      --green: #059669;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --glow-purple: rgba(234,88,12,0.08);
+      --glow-blue: rgba(194,65,12,0.06);
+      --glow-cyan: rgba(217,119,6,0.05);
+      --nav-scrolled-bg: rgba(251,251,254,0.9);
+      --mockup-bg: rgba(255,255,255,0.95);
+      --mockup-shadow: rgba(0,0,0,0.1);
+      --particle-opacity: 1;
+    }
+
+    /* ── Theme toggle button ───────────────────────────────────────────── */
+    .theme-toggle {
+      position: relative;
+      width: 52px;
+      height: 28px;
+      border-radius: 100px;
+      border: 1px solid var(--border-card);
+      background: var(--bg-card);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      padding: 0 4px;
+      transition: background 0.3s, border-color 0.3s;
+      flex-shrink: 0;
+    }
+    .theme-toggle:hover { border-color: var(--border-card-hover); }
+    .theme-toggle-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--purple), var(--blue));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 8px rgba(139,92,246,0.3);
+    }
+    [data-theme="light"] .theme-toggle-thumb {
+      transform: translateX(23px);
+      background: linear-gradient(135deg, #f59e0b, #f97316);
+      box-shadow: 0 2px 8px rgba(245,158,11,0.3);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg-deep);
+      color: var(--text-primary);
+      overflow-x: hidden;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      transition: background 0.4s ease, color 0.4s ease;
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       GLOBAL BACKGROUND GLOW
+       ════════════════════════════════════════════════════════════════════════ */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 10%, var(--glow-purple), transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 30%, var(--glow-blue), transparent 50%),
+        radial-gradient(ellipse 70% 40% at 50% 80%, var(--glow-cyan), transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    section, header, footer { position: relative; z-index: 1; }
+
+    a { color: inherit; text-decoration: none; }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       NAV BAR
+       ════════════════════════════════════════════════════════════════════════ */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 16px 0;
+      transition: background 0.3s, backdrop-filter 0.3s, box-shadow 0.3s;
+    }
+    .navbar.scrolled {
+      background: var(--nav-scrolled-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 1px 0 var(--border-card);
+    }
+    .navbar .container {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+    .nav-logo-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--purple), var(--blue));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      list-style: none;
+      margin-left: auto;
+    }
+    .nav-links a {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      transition: color 0.2s;
+      font-weight: 500;
+    }
+    .nav-links a:hover { color: var(--text-primary); }
+    .nav-cta {
+      padding: 8px 20px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--purple), var(--blue));
+      color: white !important;
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .nav-cta:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       HERO SECTION
+       ════════════════════════════════════════════════════════════════════════ */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 24px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Floating particles */
+    .particles {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      opacity: var(--particle-opacity);
+    }
+    .particle {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      animation: float-up linear infinite;
+    }
+    .particle-purple { background: rgba(139,92,246,0.3); }
+    .particle-blue { background: rgba(59,130,246,0.3); }
+    .particle-cyan { background: rgba(6,182,212,0.3); }
+
+    [data-theme="light"] .particle-purple {
+      background: rgba(124,58,237,0.12);
+      box-shadow: 0 0 8px rgba(124,58,237,0.1);
+      border: 1px solid rgba(124,58,237,0.1);
+    }
+    [data-theme="light"] .particle-blue {
+      background: rgba(37,99,235,0.12);
+      box-shadow: 0 0 8px rgba(37,99,235,0.1);
+      border: 1px solid rgba(37,99,235,0.1);
+    }
+    [data-theme="light"] .particle-cyan {
+      background: rgba(8,145,178,0.12);
+      box-shadow: 0 0 8px rgba(8,145,178,0.1);
+      border: 1px solid rgba(8,145,178,0.1);
+    }
+    @keyframes float-up {
+      0% { transform: translateY(100vh) scale(0); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+    }
+
+    /* Audio waveform background */
+    .hero-waveform {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 200px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 4px;
+      opacity: 0.08;
+      pointer-events: none;
+    }
+    .hero-waveform .bar {
+      width: 4px;
+      border-radius: 4px 4px 0 0;
+      background: linear-gradient(to top, var(--purple), var(--cyan));
+      animation: wave-pulse 1.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes wave-pulse {
+      0% { height: var(--h-min); }
+      100% { height: var(--h-max); }
+    }
+
+    .hero-content { position: relative; z-index: 2; max-width: 800px; }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 100px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+      backdrop-filter: blur(10px);
+    }
+    .hero-badge .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.4); }
+      50% { box-shadow: 0 0 0 6px rgba(16,185,129,0); }
+    }
+
+    .hero h1 {
+      font-size: clamp(2.8rem, 6vw, 4.5rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: 24px;
+    }
+    .hero h1 .gradient-text {
+      background: linear-gradient(135deg, var(--purple), var(--blue), var(--cyan));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-sub {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      color: var(--text-secondary);
+      max-width: 580px;
+      margin: 0 auto 40px;
+      line-height: 1.7;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 32px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--purple), var(--blue));
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(139,92,246,0.3);
+    }
+    .btn-primary:hover::before { opacity: 1; }
+    .btn-primary .apple-icon { font-size: 1.2em; }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      border-radius: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      color: var(--text-secondary);
+      font-weight: 500;
+      font-size: 1rem;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      transition: border-color 0.2s, color 0.2s, transform 0.2s;
+    }
+    .btn-secondary:hover {
+      border-color: var(--border-card-hover);
+      color: var(--text-primary);
+      transform: translateY(-1px);
+    }
+
+    .hero-note {
+      margin-top: 24px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* App mockup */
+    .hero-mockup {
+      margin-top: 64px;
+      perspective: 1000px;
+    }
+    .mockup-window {
+      max-width: 520px;
+      margin: 0 auto;
+      background: var(--mockup-bg);
+      border-radius: 16px;
+      border: 1px solid var(--border-card);
+      overflow: hidden;
+      box-shadow:
+        0 20px 60px var(--mockup-shadow),
+        0 0 80px var(--glow-purple);
+      transform: rotateX(4deg);
+      transition: transform 0.5s;
+    }
+    .mockup-window:hover { transform: rotateX(0deg); }
+    .mockup-titlebar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 18px;
+      background: rgba(255,255,255,0.03);
+      border-bottom: 1px solid var(--border-card);
+    }
+    .mockup-dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+    }
+    .mockup-dot.red { background: #ff5f57; }
+    .mockup-dot.yellow { background: #febc2e; }
+    .mockup-dot.green { background: #28c840; }
+    .mockup-title {
+      flex: 1;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    .mockup-body {
+      padding: 28px 24px;
+    }
+    .mockup-status {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .mockup-status-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .mockup-status-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px rgba(16,185,129,0.5);
+      animation: pulse-dot 2s infinite;
+    }
+    .mockup-status-text {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--green);
+    }
+    .mockup-status-badge {
+      font-size: 0.75rem;
+      padding: 4px 12px;
+      border-radius: 100px;
+      background: rgba(139,92,246,0.15);
+      color: var(--purple);
+      font-weight: 600;
+    }
+
+    /* Mini waveform in mockup */
+    .mockup-waveform {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      height: 50px;
+      margin-bottom: 20px;
+    }
+    .mockup-waveform .mbar {
+      width: 3px;
+      border-radius: 3px;
+      background: linear-gradient(to top, var(--purple), var(--cyan));
+      animation: mock-wave 0.8s ease-in-out infinite alternate;
+    }
+    @keyframes mock-wave {
+      0% { height: var(--mh-min); }
+      100% { height: var(--mh-max); }
+    }
+
+    .mockup-presets {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .mockup-preset {
+      flex: 1;
+      padding: 8px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      color: var(--text-secondary);
+      transition: all 0.2s;
+    }
+    .mockup-preset.active {
+      background: rgba(139,92,246,0.15);
+      border-color: var(--purple);
+      color: var(--purple);
+    }
+    .mockup-pitch {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .mockup-pitch-bar {
+      flex: 1;
+      height: 4px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 4px;
+      margin: 0 12px;
+      position: relative;
+      overflow: hidden;
+    }
+    .mockup-pitch-fill {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 65%;
+      border-radius: 4px;
+      background: linear-gradient(90deg, var(--purple), var(--blue));
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       PROBLEM SECTION
+       ════════════════════════════════════════════════════════════════════════ */
+    .problem {
+      padding: 120px 0;
+    }
+    .section-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--purple);
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+      line-height: 1.15;
+    }
+    .section-sub {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      max-width: 600px;
+      line-height: 1.7;
+    }
+
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      margin-top: 56px;
+    }
+
+    .problem-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 16px;
+      padding: 32px 28px;
+      backdrop-filter: blur(10px);
+      transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+    }
+    .problem-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--border-card-hover);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+    }
+    .problem-card .card-icon {
+      width: 48px; height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      margin-bottom: 20px;
+    }
+    .problem-card:nth-child(1) .card-icon { background: rgba(239,68,68,0.12); }
+    .problem-card:nth-child(2) .card-icon { background: rgba(245,158,11,0.12); }
+    .problem-card:nth-child(3) .card-icon { background: rgba(139,92,246,0.12); }
+    .problem-card h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .problem-card p {
+      font-size: 0.92rem;
+      color: var(--text-secondary);
+      line-height: 1.65;
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       SOLUTION / FEATURES SECTION
+       ════════════════════════════════════════════════════════════════════════ */
+    .solution {
+      padding: 120px 0;
+    }
+    .solution .section-header {
+      text-align: center;
+      margin-bottom: 64px;
+    }
+    .solution .section-sub {
+      margin: 0 auto;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+    @media (max-width: 768px) {
+      .features-grid { grid-template-columns: 1fr; }
+    }
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 16px;
+      padding: 32px 28px;
+      backdrop-filter: blur(10px);
+      transition: transform 0.3s, border-color 0.3s;
+    }
+    .feature-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--border-card-hover);
+    }
+    .feature-card .feat-icon {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      margin-bottom: 18px;
+      background: rgba(139,92,246,0.1);
+    }
+    .feature-card:nth-child(2) .feat-icon { background: rgba(59,130,246,0.1); }
+    .feature-card:nth-child(3) .feat-icon { background: rgba(6,182,212,0.1); }
+    .feature-card:nth-child(4) .feat-icon { background: rgba(16,185,129,0.1); }
+    .feature-card h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .feature-card p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* Waveform comparison */
+    .wave-compare {
+      margin-top: 48px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 24px;
+      align-items: center;
+    }
+    @media (max-width: 768px) {
+      .wave-compare { grid-template-columns: 1fr; }
+    }
+    .wave-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 16px;
+      padding: 28px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+    }
+    .wave-box h4 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      font-weight: 600;
+    }
+    .wave-visual {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      height: 60px;
+    }
+    .wave-visual .wbar {
+      width: 3px;
+      border-radius: 3px;
+    }
+    .wave-box.before .wbar {
+      background: var(--text-muted);
+      animation: flat-wave 2s ease-in-out infinite alternate;
+    }
+    .wave-box.after .wbar {
+      background: linear-gradient(to top, var(--purple), var(--cyan));
+      animation: rich-wave 0.9s ease-in-out infinite alternate;
+    }
+    @keyframes flat-wave {
+      0% { height: var(--fw-min); }
+      100% { height: var(--fw-max); }
+    }
+    @keyframes rich-wave {
+      0% { height: var(--rw-min); }
+      100% { height: var(--rw-max); }
+    }
+    .wave-arrow {
+      font-size: 2rem;
+      color: var(--purple);
+    }
+    @media (max-width: 768px) {
+      .wave-arrow { transform: rotate(90deg); }
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       HOW IT WORKS
+       ════════════════════════════════════════════════════════════════════════ */
+    .how-it-works {
+      padding: 120px 0;
+    }
+    .how-it-works .section-header {
+      text-align: center;
+      margin-bottom: 64px;
+    }
+    .how-it-works .section-sub { margin: 0 auto; }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      position: relative;
+    }
+    @media (max-width: 768px) {
+      .steps { grid-template-columns: 1fr; }
+    }
+    /* Connecting line */
+    .steps::before {
+      content: '';
+      position: absolute;
+      top: 60px;
+      left: calc(16.67% + 12px);
+      right: calc(16.67% + 12px);
+      height: 2px;
+      background: linear-gradient(90deg, var(--purple), var(--blue), var(--cyan));
+      opacity: 0.3;
+    }
+    @media (max-width: 768px) {
+      .steps::before { display: none; }
+    }
+    .step-card {
+      text-align: center;
+      position: relative;
+    }
+    .step-number {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      font-weight: 800;
+      margin: 0 auto 24px;
+      background: linear-gradient(135deg, var(--purple), var(--blue));
+      box-shadow: 0 4px 20px rgba(139,92,246,0.3);
+      position: relative;
+      z-index: 2;
+    }
+    .step-card h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .step-card p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+    .step-card code {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 6px 14px;
+      border-radius: 8px;
+      background: rgba(139,92,246,0.1);
+      border: 1px solid rgba(139,92,246,0.2);
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.8rem;
+      color: var(--purple);
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       INTEGRATIONS BAR
+       ════════════════════════════════════════════════════════════════════════ */
+    .integrations {
+      padding: 80px 0;
+      text-align: center;
+    }
+    .integrations p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+      margin-bottom: 32px;
+    }
+    .integration-logos {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 48px;
+      flex-wrap: wrap;
+    }
+    .integration-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      opacity: 0.6;
+      transition: opacity 0.3s;
+    }
+    .integration-item:hover { opacity: 1; }
+    .integration-item .int-icon {
+      font-size: 1.8rem;
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       PRICING
+       ════════════════════════════════════════════════════════════════════════ */
+    .pricing {
+      padding: 120px 0;
+    }
+    .pricing .section-header {
+      text-align: center;
+      margin-bottom: 64px;
+    }
+    .pricing .section-sub { margin: 0 auto; }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    @media (max-width: 640px) {
+      .pricing-grid { grid-template-columns: 1fr; }
+    }
+    .pricing-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 20px;
+      padding: 36px 32px;
+      backdrop-filter: blur(10px);
+      transition: transform 0.3s, border-color 0.3s;
+      position: relative;
+    }
+    .pricing-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--border-card-hover);
+    }
+    .pricing-card.featured {
+      border-color: var(--purple);
+      box-shadow: 0 0 60px rgba(139,92,246,0.1);
+    }
+    .pricing-card.featured::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: 20px;
+      padding: 1px;
+      background: linear-gradient(135deg, var(--purple), var(--blue), var(--cyan));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+    .pricing-popular {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 4px 16px;
+      border-radius: 100px;
+      background: linear-gradient(135deg, var(--purple), var(--blue));
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+    .pricing-card .plan-name {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+    .pricing-card .plan-price {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    .pricing-card .plan-price span {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+    .pricing-card .plan-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 28px;
+    }
+    .pricing-features {
+      list-style: none;
+      margin-bottom: 28px;
+    }
+    .pricing-features li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      padding: 6px 0;
+    }
+    .pricing-features li .check {
+      color: var(--green);
+      font-weight: bold;
+    }
+    .btn-plan {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 0.95rem;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-plan.free {
+      background: var(--bg-card-hover);
+      border: 1px solid var(--border-card);
+      color: var(--text-primary);
+    }
+    .btn-plan.pro {
+      background: linear-gradient(135deg, var(--purple), var(--blue));
+      color: white;
+    }
+    .btn-plan:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       FAQ
+       ════════════════════════════════════════════════════════════════════════ */
+    .faq {
+      padding: 120px 0;
+    }
+    .faq .section-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    .faq .section-sub { margin: 0 auto; }
+
+    .faq-list {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .faq-item {
+      border-bottom: 1px solid var(--border-card);
+    }
+    .faq-question {
+      width: 100%;
+      padding: 20px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font);
+      text-align: left;
+    }
+    .faq-question .faq-icon {
+      font-size: 1.3rem;
+      color: var(--text-muted);
+      transition: transform 0.3s;
+      flex-shrink: 0;
+      margin-left: 16px;
+    }
+    .faq-item.open .faq-icon { transform: rotate(45deg); }
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease, padding 0.35s ease;
+    }
+    .faq-item.open .faq-answer {
+      max-height: 200px;
+      padding-bottom: 20px;
+    }
+    .faq-answer p {
+      font-size: 0.92rem;
+      color: var(--text-secondary);
+      line-height: 1.65;
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       CTA BANNER
+       ════════════════════════════════════════════════════════════════════════ */
+    .cta-banner {
+      padding: 100px 0;
+      text-align: center;
+      position: relative;
+    }
+    .cta-banner::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(139,92,246,0.08), transparent 60%);
+      pointer-events: none;
+    }
+    .cta-banner h2 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      margin-bottom: 16px;
+      letter-spacing: -0.02em;
+    }
+    .cta-banner p {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       FOOTER
+       ════════════════════════════════════════════════════════════════════════ */
+    .site-footer {
+      padding: 48px 0;
+      border-top: 1px solid var(--border-card);
+    }
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .footer-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .footer-left .nav-logo-icon {
+      width: 28px; height: 28px;
+      font-size: 0.9rem;
+      border-radius: 8px;
+    }
+    .footer-brand {
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+    .footer-center {
+      display: flex;
+      gap: 24px;
+    }
+    .footer-center a {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      transition: color 0.2s;
+    }
+    .footer-center a:hover { color: var(--text-secondary); }
+    .footer-right {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       SCROLL REVEAL ANIMATIONS
+       ════════════════════════════════════════════════════════════════════════ */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-left {
+      opacity: 0;
+      transform: translateX(-40px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal-left.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    .reveal-right {
+      opacity: 0;
+      transform: translateX(40px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal-right.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* Stagger children */
+    .stagger-children .reveal:nth-child(1) { transition-delay: 0.05s; }
+    .stagger-children .reveal:nth-child(2) { transition-delay: 0.12s; }
+    .stagger-children .reveal:nth-child(3) { transition-delay: 0.19s; }
+    .stagger-children .reveal:nth-child(4) { transition-delay: 0.26s; }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       MOBILE NAV
+       ════════════════════════════════════════════════════════════════════════ */
+    .nav-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    @media (max-width: 768px) {
+      .nav-toggle { display: block; }
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        background: var(--nav-scrolled-bg);
+        backdrop-filter: blur(20px);
+        padding: 24px;
+        gap: 16px;
+        border-bottom: 1px solid var(--border-card);
+      }
+      .nav-links.open { display: flex; }
+      .hero h1 { font-size: 2.4rem; }
+      .mockup-window { max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══ NAVBAR ════════════════════════════════════════════════════════════ -->
+  <nav class="navbar" id="navbar">
+    <div class="container">
+      <a href="#" class="nav-logo">
+        <img src="logo.png" style="width:36px; height:36px; border-radius:10px; box-shadow: 0 4px 12px rgba(249,115,22,0.3);" alt="MicMorph Logo" />
+        MicMorph
+      </a>
+      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+        <div class="theme-toggle-thumb">
+          <span class="theme-icon">🌙</span>
+        </div>
+      </button>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Menu">☰</button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#how-it-works">How It Works</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#faq">FAQ</a></li>
+        <li><a href="MicMorph_0.1.0_aarch64.dmg" download class="nav-cta">Download</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ══ HERO ══════════════════════════════════════════════════════════════ -->
+  <section class="hero" id="hero">
+    <!-- Floating particles -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Background waveform -->
+    <div class="hero-waveform" id="hero-waveform"></div>
+
+    <div class="hero-content">
+      <div class="hero-badge">
+        <div class="dot"></div>
+        Now available for macOS
+      </div>
+
+      <h1>Your Voice,<br><span class="gradient-text">Reinvented.</span></h1>
+
+      <p class="hero-sub">
+        Transform your voice in real-time on Google Meet, Zoom &amp; Slack.
+        Sound deeper, bolder, or entirely different — with zero setup.
+      </p>
+
+      <div class="hero-actions" id="download">
+        <a href="MicMorph_0.1.0_aarch64.dmg" download class="btn-primary">
+          <span class="apple-icon"></span>
+          Download for macOS
+        </a>
+        <a href="#how-it-works" class="btn-secondary">
+          See How It Works →
+        </a>
+      </div>
+
+      <p class="hero-note">Free forever · 60 min/day · No account required</p>
+
+      <!-- App Mockup -->
+      <div class="hero-mockup">
+        <div class="mockup-window">
+          <div class="mockup-titlebar">
+            <div class="mockup-dot red"></div>
+            <div class="mockup-dot yellow"></div>
+            <div class="mockup-dot green"></div>
+            <div class="mockup-title">MicMorph</div>
+            <div style="width: 36px;"></div>
+          </div>
+          <div class="mockup-body">
+            <div class="mockup-status">
+              <div class="mockup-status-left">
+                <div class="mockup-status-dot"></div>
+                <span class="mockup-status-text">Active</span>
+              </div>
+              <span class="mockup-status-badge">-5 st</span>
+            </div>
+            <div class="mockup-waveform" id="mockup-waveform"></div>
+            <div class="mockup-presets">
+              <div class="mockup-preset">Subtle</div>
+              <div class="mockup-preset">Medium</div>
+              <div class="mockup-preset active">Deep</div>
+              <div class="mockup-preset">Deepest</div>
+            </div>
+            <div class="mockup-pitch">
+              <span>Natural</span>
+              <div class="mockup-pitch-bar">
+                <div class="mockup-pitch-fill"></div>
+              </div>
+              <span>Deepest</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ PROBLEM ═══════════════════════════════════════════════════════════ -->
+  <section class="problem" id="problem">
+    <div class="container">
+      <div class="reveal">
+        <div class="section-label">💭 The Problem</div>
+        <h2 class="section-title">The Awkward Truth<br>About Video Calls</h2>
+        <p class="section-sub">
+          We've all been there. Your voice doesn't sound how you feel — and it shows.
+        </p>
+      </div>
+
+      <div class="problem-grid stagger-children">
+        <div class="problem-card reveal">
+          <div class="card-icon">🎤</div>
+          <h3>"I don't sound like myself"</h3>
+          <p>Your voice on a call sounds thin, high-pitched, or just… off. You know you're confident, but your mic tells a different story. First impressions happen in seconds.</p>
+        </div>
+        <div class="problem-card reveal">
+          <div class="card-icon">😴</div>
+          <h3>"Every call feels the same"</h3>
+          <p>Hours of monotone meetings drain the life out of everyone. What if you could add gravitas, or just break the ice with something unexpected?</p>
+        </div>
+        <div class="problem-card reveal">
+          <div class="card-icon">🔒</div>
+          <h3>"I want to protect my identity"</h3>
+          <p>Anonymous feedback calls, sensitive meetings, content creation — sometimes you need your voice to be unrecognizable. Privacy isn't optional.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SOLUTION / FEATURES ═══════════════════════════════════════════════ -->
+  <section class="solution" id="features">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="section-label">✨ The Solution</div>
+        <h2 class="section-title">Meet MicMorph</h2>
+        <p class="section-sub">
+          A tiny macOS app that sits between your microphone and your call.
+          Real-time voice transformation that sounds completely natural.
+        </p>
+      </div>
+
+      <div class="features-grid stagger-children">
+        <div class="feature-card reveal">
+          <div class="feat-icon">⚡</div>
+          <h3>Real-Time Pitch Shifting</h3>
+          <p>Zero perceptible latency. Your voice is transformed and delivered to your call instantly — powered by SoundTouch DSP, not cloud processing.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feat-icon">🎛️</div>
+          <h3>Masculine & Feminine Modes</h3>
+          <p>Switch between deep, authoritative masculine tones and bright, expressive feminine voices with a single click. Eight presets, infinite slider control.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feat-icon">🔄</div>
+          <h3>Auto-Detect Your Calls</h3>
+          <p>Join a Google Meet, Zoom, or Slack call and MicMorph activates automatically. Hang up and it stops. Zero buttons to press, zero friction.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feat-icon">🔐</div>
+          <h3>100% Local Processing</h3>
+          <p>Your voice never leaves your Mac. No cloud, no servers, no data collection. Everything runs locally using macOS CoreAudio — your privacy is absolute.</p>
+        </div>
+      </div>
+
+      <!-- Waveform before/after -->
+      <div class="wave-compare reveal">
+        <div class="wave-box before">
+          <h4>Your Voice</h4>
+          <div class="wave-visual" id="wave-before"></div>
+        </div>
+        <div class="wave-arrow">→</div>
+        <div class="wave-box after">
+          <h4>With MicMorph</h4>
+          <div class="wave-visual" id="wave-after"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ HOW IT WORKS ══════════════════════════════════════════════════════ -->
+  <section class="how-it-works" id="how-it-works">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="section-label">🎯 How It Works</div>
+        <h2 class="section-title">Three Steps. That's It.</h2>
+        <p class="section-sub">
+          No complex setup, no audio routing nightmares. Just install and go.
+        </p>
+      </div>
+
+      <div class="steps stagger-children">
+        <div class="step-card reveal">
+          <div class="step-number">1</div>
+          <h3>Download MicMorph</h3>
+          <p>Grab the free app for macOS. On first launch, it walks you through installing BlackHole — the tiny audio bridge that makes it all work.</p>
+          <a href="MicMorph_0.1.0_aarch64.dmg" download class="btn-primary" style="margin-top:14px; padding:10px 22px; font-size:0.85rem; display:inline-flex;">
+            <span class="apple-icon"></span> Download for macOS
+          </a>
+        </div>
+        <div class="step-card reveal">
+          <div class="step-number">2</div>
+          <h3>Choose Your Voice</h3>
+          <p>Open MicMorph, pick a preset — Subtle, Medium, Deep, or Deepest — and fine-tune with the slider.</p>
+        </div>
+        <div class="step-card reveal">
+          <div class="step-number">3</div>
+          <h3>Join Your Call</h3>
+          <p>Select "MicMorph" as your microphone in Google Meet or Zoom. MicMorph auto-activates and you sound different instantly.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ INTEGRATIONS ══════════════════════════════════════════════════════ -->
+  <section class="integrations reveal">
+    <div class="container">
+      <p>Works seamlessly with</p>
+      <div class="integration-logos">
+        <div class="integration-item">
+          <span class="int-icon">📹</span> Google Meet
+        </div>
+        <div class="integration-item">
+          <span class="int-icon">🟦</span> Zoom
+        </div>
+        <div class="integration-item">
+          <span class="int-icon">💬</span> Slack
+        </div>
+        <div class="integration-item">
+          <span class="int-icon">🎮</span> Discord
+        </div>
+        <div class="integration-item">
+          <span class="int-icon">🎥</span> OBS Studio
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ PRICING ═══════════════════════════════════════════════════════════ -->
+  <section class="pricing" id="pricing">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="section-label">🏷️ Pricing</div>
+        <h2 class="section-title">Simple, Honest Pricing</h2>
+        <p class="section-sub">
+          Start free. Upgrade when you need more.
+        </p>
+      </div>
+
+      <div class="pricing-grid stagger-children">
+        <div class="pricing-card reveal">
+          <div class="plan-name">Free</div>
+          <div class="plan-price">$0 <span>/ forever</span></div>
+          <div class="plan-desc">Perfect for trying it out</div>
+          <ul class="pricing-features">
+            <li><span class="check">✓</span> 60 minutes per day</li>
+            <li><span class="check">✓</span> All voice presets</li>
+            <li><span class="check">✓</span> Auto call detection</li>
+            <li><span class="check">✓</span> Preview your voice</li>
+            <li><span class="check">✓</span> 100% local processing</li>
+          </ul>
+          <a href="MicMorph_0.1.0_aarch64.dmg" download class="btn-plan free">Download Free</a>
+        </div>
+        <div class="pricing-card featured reveal">
+          <div class="pricing-popular">✦ Most Popular</div>
+          <div class="plan-name">Pro</div>
+          <div class="plan-price">$4.99 <span>/ month</span></div>
+          <div class="plan-desc">For daily power users</div>
+          <ul class="pricing-features">
+            <li><span class="check">✓</span> <strong>Unlimited</strong> usage</li>
+            <li><span class="check">✓</span> All voice presets</li>
+            <li><span class="check">✓</span> Auto call detection</li>
+            <li><span class="check">✓</span> Preview your voice</li>
+            <li><span class="check">✓</span> Priority support</li>
+            <li><span class="check">✓</span> Early access to new voices</li>
+          </ul>
+          <a href="MicMorph_0.1.0_aarch64.dmg" download class="btn-plan pro">Download Free Trial</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ FAQ ═══════════════════════════════════════════════════════════════ -->
+  <section class="faq" id="faq">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="section-label">❓ FAQ</div>
+        <h2 class="section-title">Got Questions?</h2>
+        <p class="section-sub">Everything you need to know about MicMorph.</p>
+      </div>
+
+      <div class="faq-list reveal">
+        <div class="faq-item">
+          <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+            Does it work with Google Meet?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>Yes! MicMorph works with Google Meet, Zoom, Slack, Discord, OBS, and any app that lets you choose a microphone input. Just select "MicMorph" (BlackHole 2ch) as your mic.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+            Can the other person tell I'm using it?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>No. MicMorph uses professional-grade pitch shifting (SoundTouch DSP) that preserves your natural speech patterns. At moderate settings (-1 to -5 semitones), it sounds completely natural — like it's just your voice.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+            Is my voice data stored or sent anywhere?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>Absolutely not. MicMorph processes everything locally on your Mac using CoreAudio. There are no servers, no cloud, no analytics on your audio. Your voice stays on your machine — period.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+            What about Windows or Linux?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>MicMorph is currently macOS-only. Windows and Linux support is on our roadmap. Sign up for updates and we'll let you know when it's ready!</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+            Does it slow down my Mac?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>Not at all. MicMorph uses less than 2% CPU. It runs as a lightweight background process in your menu bar and has zero impact on your system performance or call quality.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+            What is BlackHole and why do I need it?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>BlackHole is a free, open-source virtual audio driver for macOS. It creates an invisible "bridge" that lets MicMorph send your transformed voice to any app. It's a one-time install via Homebrew and requires a restart.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ CTA BANNER ════════════════════════════════════════════════════════ -->
+  <section class="cta-banner reveal">
+    <div class="container">
+      <h2>Ready to <span class="gradient-text">sound different?</span></h2>
+      <p>Join thousands of professionals who've already transformed their voice on calls.</p>
+      <a href="MicMorph_0.1.0_aarch64.dmg" download class="btn-primary">
+        <span class="apple-icon"></span>
+        Download MicMorph — It's Free
+      </a>
+    </div>
+  </section>
+
+  <!-- ══ FOOTER ════════════════════════════════════════════════════════════ -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-left">
+          <img src="logo.png" style="width:28px; height:28px; border-radius:8px;" alt="MicMorph Logo" />
+          <span class="footer-brand">MicMorph</span>
+        </div>
+        <div class="footer-center">
+          <a href="#features">Features</a>
+          <a href="#pricing">Pricing</a>
+          <a href="#faq">FAQ</a>
+          <a href="#">Privacy</a>
+          <a href="#">Terms</a>
+        </div>
+        <div class="footer-right">
+          Made with 🎙️ in India
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ══ JAVASCRIPT ════════════════════════════════════════════════════════ -->
+  <script>
+    // ── Navbar scroll effect ───────────────────────────────────────────────
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 40);
+    });
+
+    // ── Mobile nav toggle ──────────────────────────────────────────────────
+    document.getElementById('nav-toggle').addEventListener('click', () => {
+      document.getElementById('nav-links').classList.toggle('open');
+    });
+
+    // ── Theme toggle ──────────────────────────────────────────────────────
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = themeToggle.querySelector('.theme-icon');
+    const html = document.documentElement;
+
+    // Restore saved theme
+    const savedTheme = localStorage.getItem('micmorph-theme');
+    if (savedTheme) {
+      html.setAttribute('data-theme', savedTheme);
+      themeIcon.textContent = savedTheme === 'light' ? '☀️' : '🌙';
+    }
+
+    themeToggle.addEventListener('click', () => {
+      const current = html.getAttribute('data-theme');
+      const next = current === 'light' ? 'dark' : 'light';
+      if (next === 'dark') {
+        html.removeAttribute('data-theme');
+      } else {
+        html.setAttribute('data-theme', next);
+      }
+      themeIcon.textContent = next === 'light' ? '☀️' : '🌙';
+      localStorage.setItem('micmorph-theme', next);
+    });
+
+    // ── Generate hero waveform bars ────────────────────────────────────────
+    const heroWaveform = document.getElementById('hero-waveform');
+    for (let i = 0; i < 80; i++) {
+      const bar = document.createElement('div');
+      bar.classList.add('bar');
+      const hMin = 20 + Math.random() * 40;
+      const hMax = hMin + 40 + Math.random() * 80;
+      bar.style.setProperty('--h-min', hMin + 'px');
+      bar.style.setProperty('--h-max', hMax + 'px');
+      bar.style.animationDelay = (Math.random() * 2) + 's';
+      bar.style.animationDuration = (1 + Math.random() * 1.5) + 's';
+      heroWaveform.appendChild(bar);
+    }
+
+    // ── Generate particles ─────────────────────────────────────────────────
+    const particles = document.getElementById('particles');
+    for (let i = 0; i < 40; i++) {
+      const p = document.createElement('div');
+      p.classList.add('particle');
+      // Assign color class for theme-awareness
+      const colorClasses = ['particle-purple', 'particle-blue', 'particle-cyan'];
+      p.classList.add(colorClasses[Math.floor(Math.random() * 3)]);
+      p.style.left = Math.random() * 100 + '%';
+      p.style.animationDuration = (8 + Math.random() * 12) + 's';
+      p.style.animationDelay = (Math.random() * 10) + 's';
+      const size = 3 + Math.random() * 4;
+      p.style.width = p.style.height = size + 'px';
+      particles.appendChild(p);
+    }
+
+    // ── Generate mockup waveform bars ──────────────────────────────────────
+    const mockupWave = document.getElementById('mockup-waveform');
+    for (let i = 0; i < 40; i++) {
+      const bar = document.createElement('div');
+      bar.classList.add('mbar');
+      const mhMin = 4 + Math.random() * 8;
+      const mhMax = mhMin + 10 + Math.random() * 28;
+      bar.style.setProperty('--mh-min', mhMin + 'px');
+      bar.style.setProperty('--mh-max', mhMax + 'px');
+      bar.style.animationDelay = (Math.random() * 1) + 's';
+      bar.style.animationDuration = (0.5 + Math.random() * 0.8) + 's';
+      mockupWave.appendChild(bar);
+    }
+
+    // ── Generate before/after waveform bars ────────────────────────────────
+    const waveBefore = document.getElementById('wave-before');
+    const waveAfter = document.getElementById('wave-after');
+
+    for (let i = 0; i < 30; i++) {
+      const b = document.createElement('div');
+      b.classList.add('wbar');
+      b.style.setProperty('--fw-min', (8 + Math.random() * 5) + 'px');
+      b.style.setProperty('--fw-max', (12 + Math.random() * 10) + 'px');
+      b.style.animationDelay = (Math.random() * 2) + 's';
+      b.style.animationDuration = (1.5 + Math.random() * 1.5) + 's';
+      waveBefore.appendChild(b);
+    }
+    for (let i = 0; i < 30; i++) {
+      const b = document.createElement('div');
+      b.classList.add('wbar');
+      b.style.setProperty('--rw-min', (6 + Math.random() * 8) + 'px');
+      b.style.setProperty('--rw-max', (20 + Math.random() * 38) + 'px');
+      b.style.animationDelay = (Math.random() * 1) + 's';
+      b.style.animationDuration = (0.6 + Math.random() * 0.8) + 's';
+      waveAfter.appendChild(b);
+    }
+
+    // ── Scroll reveal (IntersectionObserver) ───────────────────────────────
+    const revealEls = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+    revealEls.forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
