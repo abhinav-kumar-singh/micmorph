@@ -1176,6 +1176,16 @@
       .mockup-window { max-width: 100%; }
     }
   </style>
+  <!-- ══ PostHog Anonymous Analytics ═════════════════════════════════════ -->
+  <script>
+    !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="capture identify alias people.set people.set_once set_config register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled onFeatureFlags getFeatureFlag getFeatureFlagPayload reloadFeatureFlags group updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures getActiveMatchingSurveys getSurveys".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+    
+    // Reads key from localStorage or window config if present
+    const phKey = localStorage.getItem('mm_ph_key') || window.POSTHOG_KEY || '';
+    if (phKey) {
+      posthog.init(phKey, { api_host: 'https://us.i.posthog.com', person_profiles: 'always' });
+    }
+  </script>
 </head>
 <body>
 
@@ -1750,6 +1760,23 @@
         if (p) p.textContent = 'Grab the installer for Windows 10/11. On first launch, it guides you through activating VB-Audio Cable — the virtual audio driver that connects to your apps.';
       }
     }
+
+    // ── Track All Downloads to PostHog ────────────────────────────────────
+    document.querySelectorAll('a[download], .btn-primary, .btn-plan, .terminal-quick-install button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const text = btn.textContent.trim();
+        const isMac = text.includes('macOS') || btn.getAttribute('href')?.includes('.dmg');
+        const isWin = text.includes('Windows') || btn.getAttribute('href')?.includes('.exe');
+        const isTerminal = text.includes('Copy') || btn.closest('.terminal-quick-install');
+        
+        if (window.posthog && typeof window.posthog.capture === 'function') {
+          window.posthog.capture('download_clicked', {
+            platform: isMac ? 'macOS' : isWin ? 'Windows' : isTerminal ? 'terminal_command' : 'other',
+            button_label: text
+          });
+        }
+      });
+    });
   </script>
 </body>
 </html>
