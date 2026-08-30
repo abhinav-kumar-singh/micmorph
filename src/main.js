@@ -139,24 +139,11 @@ async function checkUsageStatus() {
   }
 }
 
+const usageBadge        = document.getElementById('usage-badge');
+
 function updateUsageUI(status) {
-  if (!usageTimeLeft) return;
-  
-  if (status.is_pro) {
-    usageTimeLeft.textContent = 'Pro Unlimited';
-    limitCard?.classList.add('hidden');
-    return;
-  }
-  
-  if (status.bypass_active) {
-    usageTimeLeft.textContent = '0m remaining';
-    limitCard?.classList.remove('hidden');
-  } else {
-    limitCard?.classList.add('hidden');
-    const remainingSeconds = Math.max(0, status.limit_seconds - status.seconds_used_today);
-    const remainingMinutes = Math.ceil(remainingSeconds / 60);
-    usageTimeLeft.textContent = `${remainingMinutes}m remaining`;
-  }
+  usageBadge?.classList.add('hidden');
+  limitCard?.classList.add('hidden');
 }
 
 // ── Screen Management ─────────────────────────────────────────────────────────

@@ -41,7 +41,7 @@ impl AppState {
             audio_level: Arc::new(AtomicU32::new(0)),
             seconds_used_today: Arc::new(Mutex::new(0)),
             last_used_date: Arc::new(Mutex::new(String::new())),
-            is_pro: Arc::new(Mutex::new(false)),
+            is_pro: Arc::new(Mutex::new(true)),
             bypass_active: Arc::new(AtomicBool::new(false)),
         }
     }
@@ -60,7 +60,7 @@ impl AppState {
         if !path.exists() {
             *self.last_used_date.lock().unwrap() = current_date;
             *self.seconds_used_today.lock().unwrap() = 0;
-            *self.is_pro.lock().unwrap() = false;
+            *self.is_pro.lock().unwrap() = true;
             self.bypass_active.store(false, Ordering::SeqCst);
             self.save_to_disk(app_handle)?;
             return Ok(());
@@ -73,21 +73,10 @@ impl AppState {
         let mut used_seconds = self.seconds_used_today.lock().unwrap();
         let mut pro_status = self.is_pro.lock().unwrap();
 
-        *pro_status = config.is_pro;
-        *last_date = config.last_used_date.clone();
-
-        if *last_date != current_date {
-            *last_date = current_date;
-            *used_seconds = 0;
-            self.bypass_active.store(false, Ordering::SeqCst);
-        } else {
-            *used_seconds = config.seconds_used_today;
-            if !*pro_status && *used_seconds >= 3600 {
-                self.bypass_active.store(true, Ordering::SeqCst);
-            } else {
-                self.bypass_active.store(false, Ordering::SeqCst);
-            }
-        }
+        *pro_status = true; // Unlimited access for initial release
+        *last_date = current_date.clone();
+        *used_seconds = config.seconds_used_today;
+        self.bypass_active.store(false, Ordering::SeqCst);
         
         drop(last_date);
         drop(used_seconds);
@@ -281,12 +270,12 @@ pub struct UsageStatus {
 }
 
 #[tauri::command]
-pub fn get_usage_status(state: State<AppState>) -> UsageStatus {
+pub fn get_usage_status(_state: State<AppState>) -> UsageStatus {
     UsageStatus {
-        seconds_used_today: *state.seconds_used_today.lock().unwrap(),
-        limit_seconds: 3600,
-        is_pro: *state.is_pro.lock().unwrap(),
-        bypass_active: state.bypass_active.load(Ordering::SeqCst),
+        seconds_used_today: 0,
+        limit_seconds: u32::MAX,
+        is_pro: true,
+        bypass_active: false,
     }
 }
 
