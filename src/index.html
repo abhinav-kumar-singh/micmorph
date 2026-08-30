@@ -16,8 +16,8 @@
   <div id="screen-onboarding" class="screen hidden">
     <div class="onboard-card">
       <div class="onboard-icon">⚡</div>
-      <h1 id="onboard-title">Virtual Audio Setup</h1>
-      <p id="onboard-subtitle" class="onboard-subtitle">MicMorph uses a virtual audio bridge to connect to Google Meet, Zoom, Teams &amp; Slack.</p>
+      <h1 id="onboard-title">Welcome to MicMorph</h1>
+      <p id="onboard-subtitle" class="onboard-subtitle">One quick setup step to enable real-time voice tuning.</p>
 
       <div class="onboard-action-box" style="margin: 20px 0; text-align: center;">
         <button id="btn-install-driver" class="btn-primary" style="width: 100%; justify-content: center; padding: 14px 20px; font-size: 14px; font-weight: 700; box-shadow: 0 4px 20px rgba(249, 115, 22, 0.4);">
@@ -28,19 +28,27 @@
 
       <div id="manual-setup-details" style="border-top: 1px solid var(--border-color); padding-top: 16px; margin-top: 10px;">
         <div class="setup-step">
-          <div class="step-badge">ℹ️</div>
+          <div class="step-badge">1</div>
           <div class="step-content">
-            <h3 id="step1-title">Zero-Configuration Setup</h3>
-            <p id="step1-desc">Click the button above to automatically configure the virtual audio cable on your computer.</p>
+            <h3 id="step1-title">Install Virtual Audio Driver</h3>
+            <p id="step1-desc">MicMorph uses a virtual audio bridge to route your transformed voice into Zoom, Google Meet, Teams, and Slack.</p>
             <div class="code-block hidden" id="driver-action-container">
               <code id="brew-command">brew install blackhole-2ch</code>
               <button id="btn-copy-brew" class="btn-copy" title="Copy command">📋</button>
             </div>
           </div>
         </div>
+
+        <div class="setup-step" style="margin-top: 12px;">
+          <div class="step-badge">2</div>
+          <div class="step-content">
+            <h3 id="step2-title">Restart Your Device</h3>
+            <p id="step2-desc">After installation, restart your computer once to register the virtual audio driver in the system.</p>
+          </div>
+        </div>
       </div>
 
-      <button id="btn-check-blackhole" class="btn-secondary" style="margin-top: 12px; width: 100%; justify-content: center; font-size: 12px;">
+      <button id="btn-check-blackhole" class="btn-secondary" style="margin-top: 14px; width: 100%; justify-content: center; font-size: 12px;">
         ✓ I've Already Installed It — Check Now
       </button>
     </div>

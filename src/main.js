@@ -166,8 +166,8 @@ function showScreen(name) {
       if (driverAction) {
         driverAction.innerHTML = `<a href="https://download.vb-audio.com/Download_CABLE/VBCABLE_Driver_Pack43.zip" target="_blank" style="padding:8px 16px; font-size:0.85rem; text-decoration:none; display:inline-flex; align-items:center; gap:6px; color:var(--accent); font-weight:600; border:1px solid var(--border-card); border-radius:8px; background:var(--bg-card);">📥 Download Driver Installer (ZIP)</a>`;
       }
-      if (step2Title) step2Title.textContent = 'Extract & Run Setup';
-      if (step2Desc) step2Desc.textContent = 'Right-click VBCABLE_Setup_x64.exe and choose "Run as Administrator", then restart your PC.';
+      if (step2Title) step2Title.textContent = 'Restart Your Device';
+      if (step2Desc) step2Desc.textContent = 'After installation, restart your computer once to register the virtual audio driver.';
       if (step3Title) step3Title.textContent = 'Return to MicMorph';
       if (step3Desc) step3Desc.textContent = 'Launch MicMorph — your virtual microphone bridge will be ready.';
     } else {
@@ -182,8 +182,8 @@ function showScreen(name) {
           });
         });
       }
-      if (step2Title) step2Title.textContent = 'Restart Your Mac';
-      if (step2Desc) step2Desc.textContent = 'After installation, restart your Mac once to activate the virtual audio driver.';
+      if (step2Title) step2Title.textContent = 'Restart Your Device';
+      if (step2Desc) step2Desc.textContent = 'After installation, restart your computer once to activate the virtual audio driver.';
       if (step3Title) step3Title.textContent = 'Return to MicMorph';
       if (step3Desc) step3Desc.textContent = 'Come back and click the button below — we\'ll detect BlackHole automatically.';
     }
