@@ -38,9 +38,22 @@ const sliderLabelLeft    = document.getElementById('slider-label-left');
 const sliderLabelRight   = document.getElementById('slider-label-right');
 const usageTimeLeft     = document.getElementById('usage-time-left');
 const limitCard         = document.getElementById('limit-card');
+const meetSelectHint    = document.getElementById('meet-select-hint');
+
+function updateOutputDeviceLabels() {
+  const isWindows = /Win/i.test(navigator.userAgent || navigator.platform);
+  if (isWindows) {
+    if (outputDeviceName) outputDeviceName.textContent = 'CABLE Output (VB-Audio)';
+    if (meetSelectHint) meetSelectHint.innerHTML = '💡 In Google Meet / Zoom, select <strong>"CABLE Output"</strong> as your mic.';
+  } else {
+    if (outputDeviceName) outputDeviceName.textContent = 'MicMorph (BlackHole)';
+    if (meetSelectHint) meetSelectHint.innerHTML = '💡 In Google Meet / Zoom, select <strong>"MicMorph"</strong> (or BlackHole) as your mic.';
+  }
+}
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 async function init() {
+  updateOutputDeviceLabels();
   try {
     const blackholeOk = await invoke('check_blackhole');
     if (!blackholeOk) { showScreen('onboarding'); return; }
