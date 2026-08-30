@@ -316,7 +316,8 @@ pub async fn install_virtual_driver() -> Result<String, String> {
     #[cfg(target_os = "windows")]
     {
         // 1-Click driver installer for Windows
-        // Downloads VB-Audio Cable zip to %TEMP% if not present, extracts, and runs setup with admin elevation
+        // Downloads VB-Audio Cable zip to %TEMP% if not present, extracts, runs setup with admin elevation,
+        // and renames the audio endpoint to "MicMorph" in Windows Registry
         let script = r#"
             $tempDir = [System.IO.Path]::GetTempPath()
             $zipPath = Join-Path $tempDir "VBCABLE_Driver_Pack43.zip"
@@ -335,6 +336,25 @@ pub async fn install_virtual_driver() -> Result<String, String> {
             }
             
             Start-Process -FilePath $setupExe -ArgumentList "-i", "-h" -Verb RunAs -Wait
+
+            # Rename VB-Audio Cable capture/render devices to "MicMorph"
+            $renderPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\MMDevices\Audio\Render"
+            $capturePath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\MMDevices\Audio\Capture"
+
+            foreach ($base in @($renderPath, $capturePath)) {
+                if (Test-Path $base) {
+                    Get-ChildItem $base | ForEach-Object {
+                        $props = Join-Path $_.PSPath "Properties"
+                        if (Test-Path $props) {
+                            $p = Get-ItemProperty -Path $props -ErrorAction SilentlyContinue
+                            $desc = $p."{a45c254e-df1c-4efd-8020-67d146a850e0},2"
+                            if ($desc -like "*VB-Audio*" -or $desc -like "*CABLE*") {
+                                Set-ItemProperty -Path $props -Name "{b3f8fa53-0004-438e-9003-51a46e139bfc},6" -Value "MicMorph" -ErrorAction SilentlyContinue
+                            }
+                        }
+                    }
+                }
+            }
         "#;
 
         let output = std::process::Command::new("powershell")
@@ -343,7 +363,7 @@ pub async fn install_virtual_driver() -> Result<String, String> {
             .map_err(|e| format!("Failed to execute PowerShell driver installer: {}", e))?;
 
         if output.status.success() {
-            Ok("Virtual audio driver installed successfully".to_string())
+            Ok("Virtual audio driver installed successfully as MicMorph".to_string())
         } else {
             let err = String::from_utf8_lossy(&output.stderr);
             Err(format!("Driver installation failed: {}", err))
