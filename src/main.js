@@ -12,6 +12,39 @@ let currentPitch = -3;
 let selectedDevice = '';
 let waveAnimFrame = null;
 
+// ── Anonymous Telemetry (PostHog) ─────────────────────────────────────────────
+async function trackEvent(eventName, properties = {}) {
+  const key = import.meta.env?.VITE_POSTHOG_KEY;
+  const host = import.meta.env?.VITE_POSTHOG_HOST || 'https://us.i.posthog.com';
+  if (!key || key === 'YOUR_POSTHOG_PROJECT_KEY_HERE') return;
+
+  try {
+    let distinctId = localStorage.getItem('mm_anon_user_id');
+    if (!distinctId) {
+      distinctId = 'anon_' + Math.random().toString(36).substring(2, 12) + '_' + Date.now().toString(36);
+      localStorage.setItem('mm_anon_user_id', distinctId);
+    }
+
+    const isWindows = /Win/i.test(navigator.userAgent || navigator.platform);
+    await fetch(`${host.replace(/\/$/, '')}/capture/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        api_key: key,
+        event: eventName,
+        distinct_id: distinctId,
+        properties: {
+          $os: isWindows ? 'Windows' : 'macOS',
+          app_version: '0.1.0',
+          ...properties,
+        },
+      }),
+    });
+  } catch {
+    // Fail silently — analytics must never disrupt app operations
+  }
+}
+
 // ── DOM Elements ──────────────────────────────────────────────────────────────
 const screenOnboarding  = document.getElementById('screen-onboarding');
 const screenMain        = document.getElementById('screen-main');
@@ -54,6 +87,7 @@ function updateOutputDeviceLabels() {
 // ── Init ──────────────────────────────────────────────────────────────────────
 async function init() {
   updateOutputDeviceLabels();
+  trackEvent('app_opened');
   try {
     const blackholeOk = await invoke('check_blackhole');
     if (!blackholeOk) { showScreen('onboarding'); return; }
@@ -416,6 +450,7 @@ async function startProcessing() {
     setToggleState('stop');
     activeCard.classList.remove('hidden');
     deviceSelect.disabled = true;
+    trackEvent('morph_started', { pitch: currentPitch });
     
     if (previewToggle) {
       try { await invoke('toggle_preview', { enabled: previewToggle.checked }); } catch (_) {}
