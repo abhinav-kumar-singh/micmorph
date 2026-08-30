@@ -63,13 +63,13 @@ fn main() {
                             if active {
                                 // Auto-start processing
                                 let input_device = if let Some(default_mic) = crate::audio::devices::default_input_device_name() {
-                                    if !default_mic.contains("BlackHole") && !default_mic.contains("MicMorph") {
+                                    if !crate::audio::devices::is_virtual_device_name(&default_mic) {
                                         default_mic
                                     } else {
                                         let devices = crate::audio::devices::list_input_devices();
                                         devices.iter()
                                             .map(|d| d.name.clone())
-                                            .find(|name| !name.contains("BlackHole") && !name.contains("MicMorph"))
+                                            .find(|name| !crate::audio::devices::is_virtual_device_name(name))
                                             .unwrap_or_default()
                                     }
                                 } else {
@@ -165,13 +165,13 @@ fn main() {
                                     }
                                 } else {
                                     let input_device = if let Some(default_mic) = crate::audio::devices::default_input_device_name() {
-                                        if !default_mic.contains("BlackHole") && !default_mic.contains("MicMorph") {
+                                        if !crate::audio::devices::is_virtual_device_name(&default_mic) {
                                             default_mic
                                         } else {
                                             let devices = crate::audio::devices::list_input_devices();
                                             devices.iter()
                                                 .map(|d| d.name.clone())
-                                                .find(|name| !name.contains("BlackHole") && !name.contains("MicMorph"))
+                                                .find(|name| !crate::audio::devices::is_virtual_device_name(name))
                                                 .unwrap_or_default()
                                         }
                                     } else {
