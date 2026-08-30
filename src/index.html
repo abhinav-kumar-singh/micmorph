@@ -12,19 +12,19 @@
 </head>
 <body>
 
-  <!-- ── Onboarding Screen (shown if BlackHole not installed) ──────────── -->
+  <!-- ── Onboarding Screen ──────────── -->
   <div id="screen-onboarding" class="screen hidden">
     <div class="onboard-card">
       <div class="onboard-icon">🎙️</div>
-      <h1>Welcome to MicMorph</h1>
-      <p class="onboard-subtitle">One quick setup step before we begin.</p>
+      <h1 id="onboard-title">Welcome to MicMorph</h1>
+      <p id="onboard-subtitle" class="onboard-subtitle">One quick setup step before we begin.</p>
 
       <div class="setup-step">
         <div class="step-badge">1</div>
         <div class="step-content">
-          <h3>Install BlackHole Virtual Mic</h3>
-          <p>BlackHole is a free, trusted virtual audio driver. MicMorph uses it to route your processed voice to Zoom, Meet, and Slack.</p>
-          <div class="code-block">
+          <h3 id="step1-title">Install Virtual Audio Driver</h3>
+          <p id="step1-desc">MicMorph uses a virtual audio bridge to route your transformed voice into Zoom, Google Meet, Teams, and Slack.</p>
+          <div class="code-block" id="driver-action-container">
             <code id="brew-command">brew install blackhole-2ch</code>
             <button id="btn-copy-brew" class="btn-copy" title="Copy command">📋</button>
           </div>
@@ -34,21 +34,21 @@
       <div class="setup-step">
         <div class="step-badge">2</div>
         <div class="step-content">
-          <h3>Restart Your Mac</h3>
-          <p>After installation, restart to activate the virtual audio driver.</p>
+          <h3 id="step2-title">Restart Your Mac</h3>
+          <p id="step2-desc">After installation, restart your Mac to activate the virtual audio driver.</p>
         </div>
       </div>
 
       <div class="setup-step">
         <div class="step-badge">3</div>
         <div class="step-content">
-          <h3>Return to MicMorph</h3>
-          <p>Come back and click the button below — we'll detect BlackHole automatically.</p>
+          <h3 id="step3-title">Return to MicMorph</h3>
+          <p id="step3-desc">Come back and click the button below — we'll detect the virtual driver automatically.</p>
         </div>
       </div>
 
       <button id="btn-check-blackhole" class="btn-primary" style="margin-top: 8px;">
-        ✓ I've Installed It — Check Now
+        ✓ I've Completed Setup — Check Now
       </button>
     </div>
   </div>

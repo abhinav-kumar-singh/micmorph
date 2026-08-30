@@ -1213,7 +1213,7 @@
     <div class="hero-content">
       <div class="hero-badge">
         <div class="dot"></div>
-        Now available for macOS
+        Now available for macOS &amp; Windows
       </div>
 
       <h1>Your Voice,<br><span class="gradient-text">Reinvented.</span></h1>
@@ -1708,18 +1708,39 @@
     // ── OS Detection for Download Buttons ──────────────────────────────────
     const isWindows = /Win/i.test(navigator.userAgent || navigator.platform);
     if (isWindows) {
-      document.querySelectorAll('.btn-primary, .btn-plan').forEach(btn => {
-        if (btn.hasAttribute('download') || btn.textContent.includes('Download')) {
-          const appleIcon = btn.querySelector('.apple-icon');
-          if (appleIcon) {
-            appleIcon.outerHTML = '<span style="font-size:1.1rem; margin-right:4px; display:inline-block; vertical-align:middle;">⊞</span>';
-          }
-          if (btn.textContent.includes('macOS')) {
-            btn.innerHTML = btn.innerHTML.replace('macOS', 'Windows (64-bit)');
-          }
-          btn.setAttribute('href', 'MicMorph_0.1.0_x64-setup.exe');
+      const heroActions = document.querySelector('.hero-actions');
+      if (heroActions) {
+        heroActions.innerHTML = `
+          <a href="https://apps.microsoft.com/" target="_blank" class="btn-primary" style="display:inline-flex; align-items:center; gap:8px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M0 0h11.377v11.372H0zm12.623 0H24v11.372H12.623zM0 12.623h11.377V24H0zm12.623 0H24V24H12.623z"/></svg>
+            Get from Microsoft Store
+          </a>
+          <a href="MicMorph_0.1.0_x64-setup.exe" download class="btn-secondary" style="display:inline-flex; align-items:center; gap:6px;">
+            <span>⊞</span> Download Direct (.exe)
+          </a>
+        `;
+      }
+
+      // Update remaining download buttons
+      document.querySelectorAll('.nav-cta, .btn-plan, .cta-banner .btn-primary, .step-card .btn-primary').forEach(btn => {
+        const appleIcon = btn.querySelector('.apple-icon');
+        if (appleIcon) {
+          appleIcon.outerHTML = '<span style="font-size:1.1rem; margin-right:4px; display:inline-block; vertical-align:middle;">⊞</span>';
         }
+        if (btn.textContent.includes('macOS')) {
+          btn.innerHTML = btn.innerHTML.replace('macOS', 'Windows (64-bit)');
+        }
+        btn.setAttribute('href', 'MicMorph_0.1.0_x64-setup.exe');
       });
+
+      // Update Step 1 card in How It Works
+      const step1Card = document.querySelector('.step-card:nth-child(1)');
+      if (step1Card) {
+        const h3 = step1Card.querySelector('h3');
+        const p = step1Card.querySelector('p');
+        if (h3) h3.textContent = 'Download MicMorph for Windows';
+        if (p) p.textContent = 'Grab the installer for Windows 10/11. On first launch, it guides you through activating VB-Audio Cable — the virtual audio driver that connects to your apps.';
+      }
     }
   </script>
 </body>

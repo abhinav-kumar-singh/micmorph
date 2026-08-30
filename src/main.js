@@ -151,23 +151,41 @@ function showScreen(name) {
   screenOnboarding.classList.add('hidden');
   screenMain.classList.add('hidden');
   if (name === 'onboarding') {
-    const isWindows = navigator.userAgent.includes('Windows') || (navigator.platform && navigator.platform.includes('Win'));
-    if (isWindows) {
-      const onboardTitle = document.querySelector('#screen-onboarding h1');
-      const step1Title = document.querySelector('.setup-step:nth-child(1) h3');
-      const step1Desc = document.querySelector('.setup-step:nth-child(1) p');
-      const codeBlock = document.querySelector('.code-block');
-      const step2Title = document.querySelector('.setup-step:nth-child(2) h3');
-      const step2Desc = document.querySelector('.setup-step:nth-child(2) p');
+    const isWindows = /Win/i.test(navigator.userAgent || navigator.platform);
+    const step1Title = document.getElementById('step1-title');
+    const step1Desc = document.getElementById('step1-desc');
+    const driverAction = document.getElementById('driver-action-container');
+    const step2Title = document.getElementById('step2-title');
+    const step2Desc = document.getElementById('step2-desc');
+    const step3Title = document.getElementById('step3-title');
+    const step3Desc = document.getElementById('step3-desc');
 
-      if (onboardTitle) onboardTitle.textContent = 'Welcome to MicMorph';
+    if (isWindows) {
       if (step1Title) step1Title.textContent = 'Install VB-Audio Virtual Cable';
-      if (step1Desc) step1Desc.textContent = 'VB-Audio Cable is a free, trusted virtual audio driver for Windows. MicMorph uses it to route your voice to Zoom, Meet, Teams, and Discord.';
-      if (codeBlock) {
-        codeBlock.innerHTML = `<a href="https://download.vb-audio.com/Download_CABLE/VBCABLE_Driver_Pack43.zip" target="_blank" style="color:var(--accent); font-weight:600; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">📥 Download Free Driver (ZIP)</a>`;
+      if (step1Desc) step1Desc.textContent = 'VB-Audio Virtual Cable is a free, trusted audio driver for Windows. MicMorph uses it to send your voice to Zoom, Meet, Teams, and Discord.';
+      if (driverAction) {
+        driverAction.innerHTML = `<a href="https://download.vb-audio.com/Download_CABLE/VBCABLE_Driver_Pack43.zip" target="_blank" style="padding:8px 16px; font-size:0.85rem; text-decoration:none; display:inline-flex; align-items:center; gap:6px; color:var(--accent); font-weight:600; border:1px solid var(--border-card); border-radius:8px; background:var(--bg-card);">📥 Download Driver Installer (ZIP)</a>`;
       }
       if (step2Title) step2Title.textContent = 'Extract & Run Setup';
-      if (step2Desc) step2Desc.textContent = 'Right-click VBCABLE_Setup_x64.exe and select "Run as Administrator", then restart your PC.';
+      if (step2Desc) step2Desc.textContent = 'Right-click VBCABLE_Setup_x64.exe and choose "Run as Administrator", then restart your PC.';
+      if (step3Title) step3Title.textContent = 'Return to MicMorph';
+      if (step3Desc) step3Desc.textContent = 'Launch MicMorph — your virtual microphone bridge will be ready.';
+    } else {
+      if (step1Title) step1Title.textContent = 'Install BlackHole Virtual Mic';
+      if (step1Desc) step1Desc.textContent = 'BlackHole is a free, trusted virtual audio driver. MicMorph uses it to route your processed voice to Zoom, Meet, and Slack.';
+      if (driverAction) {
+        driverAction.innerHTML = `<code id="brew-command">brew install blackhole-2ch</code> <button id="btn-copy-brew" class="btn-copy" title="Copy command">📋</button>`;
+        document.getElementById('btn-copy-brew')?.addEventListener('click', () => {
+          navigator.clipboard.writeText('brew install blackhole-2ch').then(() => {
+            const btn = document.getElementById('btn-copy-brew');
+            if (btn) { btn.textContent = '✅'; setTimeout(() => { btn.textContent = '📋'; }, 2000); }
+          });
+        });
+      }
+      if (step2Title) step2Title.textContent = 'Restart Your Mac';
+      if (step2Desc) step2Desc.textContent = 'After installation, restart your Mac once to activate the virtual audio driver.';
+      if (step3Title) step3Title.textContent = 'Return to MicMorph';
+      if (step3Desc) step3Desc.textContent = 'Come back and click the button below — we\'ll detect BlackHole automatically.';
     }
     screenOnboarding.classList.remove('hidden');
   } else {
