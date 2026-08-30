@@ -44,6 +44,11 @@ jobs:
         run: |
           brew install sound-touch
 
+      - name: Install Windows System Dependencies (NSIS)
+        if: matrix.platform == 'windows-latest'
+        run: |
+          choco install nsis -y
+
       - name: Install Frontend Dependencies
         run: npm install
 
