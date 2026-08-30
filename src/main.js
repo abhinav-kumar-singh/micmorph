@@ -14,9 +14,9 @@ let waveAnimFrame = null;
 
 // ── Anonymous Telemetry (PostHog) ─────────────────────────────────────────────
 async function trackEvent(eventName, properties = {}) {
-  const key = import.meta.env?.VITE_POSTHOG_KEY;
+  const key = import.meta.env?.VITE_POSTHOG_KEY || 'phc_oqYPUzwrXfhq9iZTVbBAh4md574jZfVtsjLf88N2hrLf';
   const host = import.meta.env?.VITE_POSTHOG_HOST || 'https://us.i.posthog.com';
-  if (!key || key === 'YOUR_POSTHOG_PROJECT_KEY_HERE') return;
+  if (!key) return;
 
   try {
     let distinctId = localStorage.getItem('mm_anon_user_id');
