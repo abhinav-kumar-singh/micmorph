@@ -1233,6 +1233,15 @@
         </a>
       </div>
 
+      <div class="terminal-quick-install" style="margin: 14px auto 0; max-width: 500px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 8px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; font-family: monospace; font-size: 0.82rem; color: #cbd5e1;">
+        <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+          <span style="color: var(--accent); font-weight: 700;">$</span> curl -fsSL https://micmorph.work/install.sh | bash
+        </span>
+        <button onclick="navigator.clipboard.writeText('curl -fsSL https://micmorph.work/install.sh | bash'); this.textContent='✓ Copied!';" style="background: rgba(249,115,22,0.15); border: 1px solid rgba(249,115,22,0.3); color: var(--accent); padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer; white-space: nowrap;">
+          📋 Copy
+        </button>
+      </div>
+
       <p class="hero-note">🎉 Free for Early Adopters · Unlimited Access for a Limited Period · No Account Required</p>
 
       <!-- App Mockup -->
