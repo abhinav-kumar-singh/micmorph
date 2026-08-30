@@ -310,3 +310,69 @@ pub fn simulate_use_minutes(minutes: i32, state: State<AppState>, app_handle: ta
     state.save_to_disk(&app_handle)?;
     Ok(())
 }
+
+#[tauri::command]
+pub async fn install_virtual_driver() -> Result<String, String> {
+    #[cfg(target_os = "windows")]
+    {
+        // 1-Click driver installer for Windows
+        // Downloads VB-Audio Cable zip to %TEMP% if not present, extracts, and runs setup with admin elevation
+        let script = r#"
+            $tempDir = [System.IO.Path]::GetTempPath()
+            $zipPath = Join-Path $tempDir "VBCABLE_Driver_Pack43.zip"
+            $extractPath = Join-Path $tempDir "VBCABLE_Driver"
+            
+            if (-not (Test-Path $zipPath)) {
+                Invoke-WebRequest -Uri "https://download.vb-audio.com/Download_CABLE/VBCABLE_Driver_Pack43.zip" -OutFile $zipPath -UseBasicParsing
+            }
+            if (-not (Test-Path $extractPath)) {
+                Expand-Archive -Path $zipPath -DestinationPath $extractPath -Force
+            }
+            
+            $setupExe = Join-Path $extractPath "VBCABLE_Setup_x64.exe"
+            if (-not (Test-Path $setupExe)) {
+                $setupExe = Join-Path $extractPath "VBCABLE_Setup.exe"
+            }
+            
+            Start-Process -FilePath $setupExe -ArgumentList "-i", "-h" -Verb RunAs -Wait
+        "#;
+
+        let output = std::process::Command::new("powershell")
+            .args(&["-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", script])
+            .output()
+            .map_err(|e| format!("Failed to execute PowerShell driver installer: {}", e))?;
+
+        if output.status.success() {
+            Ok("Virtual audio driver installed successfully".to_string())
+        } else {
+            let err = String::from_utf8_lossy(&output.stderr);
+            Err(format!("Driver installation failed: {}", err))
+        }
+    }
+
+    #[cfg(target_os = "macos")]
+    {
+        // 1-Click driver installer for macOS
+        // Runs osascript with administrator privileges to install BlackHole or triggers brew
+        let script = r#"
+            do shell script "/usr/local/bin/brew install blackhole-2ch || /opt/homebrew/bin/brew install blackhole-2ch || true; killall coreaudiod 2>/dev/null || true" with administrator privileges
+        "#;
+        
+        let output = std::process::Command::new("osascript")
+            .args(&["-e", script])
+            .output()
+            .map_err(|e| format!("Failed to execute macOS installer: {}", e))?;
+
+        if output.status.success() {
+            Ok("BlackHole driver installed and CoreAudio reloaded".to_string())
+        } else {
+            let err = String::from_utf8_lossy(&output.stderr);
+            Err(format!("macOS driver installation error: {}", err))
+        }
+    }
+
+    #[cfg(not(any(target_os = "macos", target_os = "windows")))]
+    {
+        Err("Unsupported operating system".to_string())
+    }
+}

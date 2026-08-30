@@ -39,6 +39,7 @@ fn main() {
             commands::get_current_pitch,
             commands::get_usage_status,
             commands::simulate_use_minutes,
+            commands::install_virtual_driver,
         ])
         .setup(|app| {
             // Load state from disk

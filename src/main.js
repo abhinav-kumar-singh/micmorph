@@ -194,6 +194,49 @@ function showScreen(name) {
 }
 
 // ── Onboarding ────────────────────────────────────────────────────────────────
+const btnInstallDriver = document.getElementById('btn-install-driver');
+const installStatusText = document.getElementById('install-status-text');
+
+btnInstallDriver?.addEventListener('click', async () => {
+  btnInstallDriver.disabled = true;
+  btnInstallDriver.textContent = '⏳ Configuring Audio Bridge...';
+  if (installStatusText) {
+    const isWindows = /Win/i.test(navigator.userAgent || navigator.platform);
+    installStatusText.textContent = isWindows 
+      ? 'Please click "Yes" on the Windows administrator prompt...' 
+      : 'Please confirm with Touch ID or enter your Mac password...';
+  }
+
+  try {
+    const res = await invoke('install_virtual_driver');
+    console.log('Install result:', res);
+    if (installStatusText) installStatusText.textContent = '✓ Driver installed! Detecting audio bridge...';
+    
+    let attempts = 0;
+    const interval = setInterval(async () => {
+      attempts++;
+      const ok = await invoke('check_blackhole');
+      if (ok || attempts > 8) {
+        clearInterval(interval);
+        if (ok) {
+          showScreen('main');
+          await loadDevices();
+          startWaveformAnimation();
+        } else {
+          btnInstallDriver.disabled = false;
+          btnInstallDriver.textContent = '⚡ Install Audio Bridge (1-Click)';
+          if (installStatusText) installStatusText.textContent = 'Installed! Please restart your computer to activate.';
+        }
+      }
+    }, 1200);
+  } catch (err) {
+    console.error('Driver install error:', err);
+    btnInstallDriver.disabled = false;
+    btnInstallDriver.textContent = '⚡ Try Again (1-Click Install)';
+    if (installStatusText) installStatusText.textContent = 'Installation was canceled or failed. You can also use manual setup below.';
+  }
+});
+
 btnCheckBlackhole?.addEventListener('click', async () => {
   btnCheckBlackhole.textContent = 'Checking...';
   btnCheckBlackhole.disabled = true;
@@ -201,11 +244,11 @@ btnCheckBlackhole?.addEventListener('click', async () => {
     const ok = await invoke('check_blackhole');
     if (ok) { showScreen('main'); await loadDevices(); startWaveformAnimation(); }
     else {
-      const isWindows = navigator.userAgent.includes('Windows') || (navigator.platform && navigator.platform.includes('Win'));
+      const isWindows = /Win/i.test(navigator.userAgent || navigator.platform);
       btnCheckBlackhole.textContent = isWindows ? '✗ Not detected — restart your PC first' : '✗ Not detected — restart your Mac first';
-      setTimeout(() => { btnCheckBlackhole.textContent = '✓ I\'ve Installed It — Check Now'; btnCheckBlackhole.disabled = false; }, 3000);
+      setTimeout(() => { btnCheckBlackhole.textContent = '✓ I\'ve Already Installed It — Check Now'; btnCheckBlackhole.disabled = false; }, 3000);
     }
-  } catch { btnCheckBlackhole.textContent = '✓ I\'ve Installed It — Check Now'; btnCheckBlackhole.disabled = false; }
+  } catch { btnCheckBlackhole.textContent = '✓ I\'ve Already Installed It — Check Now'; btnCheckBlackhole.disabled = false; }
 });
 
 btnCopyBrew?.addEventListener('click', () => {
