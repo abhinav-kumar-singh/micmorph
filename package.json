@@ -4,7 +4,7 @@
   "description": "Real-time voice pitch tuning for Mac — sound more confident on every call",
   "scripts": {
     "dev:ui": "vite src",
-    "build:ui": "vite build src --emptyOutDir",
+    "build:ui": "vite build src --emptyOutDir --base=./",
     "tauri": "tauri",
     "dev": "tauri dev",
     "build": "tauri build"

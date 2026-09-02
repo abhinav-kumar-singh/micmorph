@@ -1233,23 +1233,47 @@
         Sound deeper, bolder, or natural — 100% free for initial early adopters.
       </p>
 
-      <div class="hero-actions" id="download">
-        <a href="MicMorph_0.1.0_aarch64.dmg" download class="btn-primary">
-          <span class="apple-icon"></span>
-          Download for macOS
-        </a>
-        <a href="#how-it-works" class="btn-secondary">
-          See How It Works →
-        </a>
+      <!-- macOS Primary Action: 1-Click Fast Terminal Install -->
+      <div id="mac-hero-container" style="max-width: 560px; margin: 0 auto 24px;">
+        <div style="background: rgba(249, 115, 22, 0.08); border: 1.5px solid rgba(249, 115, 22, 0.4); border-radius: 16px; padding: 16px 20px; box-shadow: 0 12px 35px rgba(0,0,0,0.5), 0 0 25px rgba(249,115,22,0.18); backdrop-filter: blur(12px); text-align: left;">
+          
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 0.92rem; font-weight: 700; color: #f8fafc;">
+              <span style="font-size: 1.15rem;">⚡</span> 1-Click Install for macOS
+              <span style="font-size: 0.7rem; background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.35); padding: 2px 7px; border-radius: 99px; font-weight: 600;">Recommended · Zero Setup</span>
+            </div>
+            <span style="font-size: 0.74rem; color: #94a3b8; font-weight: 500;">Apple Silicon &amp; Intel</span>
+          </div>
+
+          <div style="background: rgba(0, 0, 0, 0.65); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.86rem; color: #e2e8f0;">
+            <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: flex; align-items: center; gap: 8px;">
+              <span style="color: var(--accent); font-weight: 700; font-size: 0.95rem; user-select: none;">$</span>
+              <span style="user-select: all; letter-spacing: -0.01em;">curl -fsSL https://micmorph.work/install.sh | bash</span>
+            </div>
+            <button onclick="navigator.clipboard.writeText('curl -fsSL https://micmorph.work/install.sh | bash'); this.innerHTML='✓ Copied!'; setTimeout(() => this.innerHTML='📋 Copy Command', 2500);" style="background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; border: none; padding: 8px 16px; border-radius: 7px; font-size: 0.8rem; font-weight: 700; cursor: pointer; white-space: nowrap; box-shadow: 0 4px 14px rgba(249, 115, 22, 0.4); transition: transform 0.15s ease;">
+              📋 Copy Command
+            </button>
+          </div>
+
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px; font-size: 0.76rem; color: #94a3b8;">
+            <span>🚀 Paste in Mac Terminal to install &amp; launch in 3s</span>
+            <span style="color: #4ade80;">✓ 100% Free · Auto Driver Setup</span>
+          </div>
+        </div>
+
+        <!-- Secondary options row -->
+        <div style="display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 16px; flex-wrap: wrap;">
+          <a href="MicMorph_0.1.0_aarch64.dmg" download class="btn-dmg-guide" style="display: inline-flex; align-items: center; gap: 7px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.16); color: #e2e8f0; padding: 8px 18px; border-radius: 10px; font-weight: 600; font-size: 0.84rem; text-decoration: none; backdrop-filter: blur(8px); transition: all 0.2s ease;">
+            <span>📦</span> Download .dmg Manual Installer
+          </a>
+          <a href="#how-it-works" class="btn-secondary" style="padding: 8px 18px; font-size: 0.84rem; border-radius: 10px;">
+            See How It Works →
+          </a>
+        </div>
       </div>
 
-      <div class="terminal-quick-install" style="margin: 14px auto 0; max-width: 500px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 8px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; font-family: monospace; font-size: 0.82rem; color: #cbd5e1;">
-        <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-          <span style="color: var(--accent); font-weight: 700;">$</span> curl -fsSL https://micmorph.work/install.sh | bash
-        </span>
-        <button onclick="navigator.clipboard.writeText('curl -fsSL https://micmorph.work/install.sh | bash'); this.textContent='✓ Copied!';" style="background: rgba(249,115,22,0.15); border: 1px solid rgba(249,115,22,0.3); color: var(--accent); padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer; white-space: nowrap;">
-          📋 Copy
-        </button>
+      <div class="hero-actions" id="download" style="display: none;">
+        <!-- Filled dynamically for Windows -->
       </div>
 
       <p class="hero-note">🎉 Free for Early Adopters · Unlimited Access for a Limited Period · No Account Required</p>
@@ -1777,6 +1801,106 @@
         }
       });
     });
+
+    // ── macOS Quick Launch Guide Modal Logic ─────────────────────────────
+    function openMacGuide() {
+      const isWin = /Win/i.test(navigator.userAgent || navigator.platform);
+      if (!isWin) {
+        const m = document.getElementById('mac-guide-modal');
+        if (m) m.style.display = 'flex';
+      }
+    }
+    function closeMacGuide() {
+      const m = document.getElementById('mac-guide-modal');
+      if (m) m.style.display = 'none';
+    }
+    window.openMacGuide = openMacGuide;
+    window.closeMacGuide = closeMacGuide;
+
+    document.querySelectorAll('.nav-cta, a[href*="MicMorph_0.1.0_aarch64.dmg"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        openMacGuide();
+      });
+    });
   </script>
+
+  <!-- ══ macOS Quick Launch Guide Modal ═════════════════════════════════════ -->
+  <div id="mac-guide-modal" style="display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 999999; align-items: center; justify-content: center; padding: 20px;" onclick="if(event.target===this)closeMacGuide()">
+    <div style="background: #11141d; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 20px; max-width: 520px; width: 100%; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(249, 115, 22, 0.2); overflow: hidden;">
+      
+      <!-- Header -->
+      <div style="padding: 18px 22px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.4rem;">🍏</span>
+          <div style="text-align: left;">
+            <h3 style="font-size: 1.05rem; font-weight: 700; color: #f8fafc; margin: 0;">Opening MicMorph on macOS</h3>
+            <p style="font-size: 0.75rem; color: #94a3b8; margin: 2px 0 0;">Quick launch instructions</p>
+          </div>
+        </div>
+        <button onclick="closeMacGuide()" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #94a3b8; border-radius: 50%; width: 30px; height: 30px; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; justify-content: center;">✕</button>
+      </div>
+
+      <!-- Body -->
+      <div style="padding: 20px 22px; max-height: 80vh; overflow-y: auto;">
+        <!-- Recommended 1-Line Method -->
+        <div style="background: rgba(249, 115, 22, 0.08); border: 1.5px solid rgba(249, 115, 22, 0.35); border-radius: 12px; padding: 14px; margin-bottom: 16px; text-align: left;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+            <div style="font-size: 0.84rem; font-weight: 700; color: #f8fafc; display: flex; align-items: center; gap: 6px;">
+              <span>⚡</span> Recommended: 1-Click Fast Install
+            </div>
+            <span style="font-size: 0.68rem; background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); padding: 1px 6px; border-radius: 99px; font-weight: 600;">Zero Security Dialogs</span>
+          </div>
+          <p style="font-size: 0.78rem; color: #cbd5e1; margin: 0 0 8px;">
+            Skip manual settings by running this in Mac Terminal:
+          </p>
+          <div style="background: rgba(0, 0, 0, 0.65); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 8px; padding: 8px 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; font-family: ui-monospace, monospace; font-size: 0.8rem; color: #e2e8f0;">
+            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><span style="color: var(--accent); font-weight: 700;">$</span> curl -fsSL https://micmorph.work/install.sh | bash</span>
+            <button onclick="navigator.clipboard.writeText('curl -fsSL https://micmorph.work/install.sh | bash'); this.innerHTML='✓ Copied!'; setTimeout(() => this.innerHTML='📋 Copy', 2500);" style="background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; border: none; padding: 5px 12px; border-radius: 5px; font-size: 0.74rem; font-weight: 700; cursor: pointer; white-space: nowrap;">
+              📋 Copy
+            </button>
+          </div>
+        </div>
+
+        <div style="text-align: center; margin: 12px 0; font-size: 0.72rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; display: flex; align-items: center; gap: 10px;">
+          <span style="flex: 1; height: 1px; background: rgba(255,255,255,0.08);"></span>
+          Or Manual .dmg Setup Steps
+          <span style="flex: 1; height: 1px; background: rgba(255,255,255,0.08);"></span>
+        </div>
+
+        <!-- DMG Step-by-Step -->
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; text-align: left;">
+          <div style="display: flex; gap: 12px; align-items: flex-start; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 10px 14px;">
+            <div style="background: var(--accent); color: #fff; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; margin-top: 1px;">1</div>
+            <div>
+              <div style="font-size: 0.82rem; font-weight: 600; color: #f8fafc;">Drag to Applications</div>
+              <div style="font-size: 0.76rem; color: #94a3b8;">Open the downloaded <code>MicMorph.dmg</code> and drag <strong>MicMorph</strong> into your Applications folder.</div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 12px; align-items: flex-start; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 10px 14px;">
+            <div style="background: var(--accent); color: #fff; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; margin-top: 1px;">2</div>
+            <div>
+              <div style="font-size: 0.82rem; font-weight: 600; color: #f8fafc;">If blocked by macOS ("App is damaged / can't be opened"):</div>
+              <div style="font-size: 0.76rem; color: #94a3b8; margin-top: 2px;">
+                Open <strong>System Settings ➔ Privacy &amp; Security</strong>, scroll down to the <em>Security</em> section, and click <strong>"Open Anyway"</strong>.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- * Condition Note -->
+        <div style="background: rgba(255, 255, 255, 0.02); border: 1px dashed rgba(255, 255, 255, 0.15); border-radius: 8px; padding: 9px 12px; font-size: 0.73rem; color: #94a3b8; line-height: 1.45; text-align: left;">
+          <strong style="color: #cbd5e1;">* Why is this required on macOS?</strong><br>
+          MicMorph is a 100% free indie tool in early access. Because we haven't paid Apple's \$99/year developer fee yet, macOS Gatekeeper displays a standard security verification on first launch only.
+        </div>
+
+        <div style="margin-top: 16px; display: flex; justify-content: flex-end; gap: 10px;">
+          <button onclick="closeMacGuide()" style="background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; border: none; padding: 9px 22px; border-radius: 8px; font-size: 0.84rem; font-weight: 700; cursor: pointer; box-shadow: 0 4px 14px rgba(249, 115, 22, 0.35);">
+            ✓ Got It, Thanks!
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>

@@ -361,10 +361,9 @@ pub async fn install_virtual_driver() -> Result<String, String> {
 
     #[cfg(target_os = "macos")]
     {
-        // 1-Click driver installer for macOS
-        // Runs osascript with administrator privileges to install BlackHole or triggers brew
+        // Direct reliable 1-Click driver installer for macOS
         let script = r#"
-            do shell script "/usr/local/bin/brew install blackhole-2ch || /opt/homebrew/bin/brew install blackhole-2ch || true; killall coreaudiod 2>/dev/null || true" with administrator privileges
+            do shell script "curl -fsSL -o /tmp/BlackHole2ch.pkg 'https://github.com/ExistentialAudio/BlackHole/releases/download/v0.6.1/BlackHole2ch.v0.6.1.pkg' && installer -pkg /tmp/BlackHole2ch.pkg -target / && rm -f /tmp/BlackHole2ch.pkg && killall coreaudiod 2>/dev/null || true" with administrator privileges
         "#;
         
         let output = std::process::Command::new("osascript")

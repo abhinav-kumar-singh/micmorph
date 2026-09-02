@@ -48,57 +48,7 @@ fn main() {
                 log::error!("Failed to load config: {}", e);
             }
 
-            // Spawn background thread to monitor MicMorph active state
-            let app_handle = app.handle().clone();
-            std::thread::spawn(move || {
-                let mut last_active = false;
-                loop {
-                    std::thread::sleep(std::time::Duration::from_secs(3));
-                    
-                    let active = crate::audio::is_micmorph_device_active();
-                    if active != last_active {
-                        last_active = active;
-                        log::info!("MicMorph device activity changed: active = {}", active);
-                        
-                        if let Some(state) = app_handle.try_state::<AppState>() {
-                            if active {
-                                // Auto-start processing
-                                let input_device = if let Some(default_mic) = crate::audio::devices::default_input_device_name() {
-                                    if !crate::audio::devices::is_virtual_device_name(&default_mic) {
-                                        default_mic
-                                    } else {
-                                        let devices = crate::audio::devices::list_input_devices();
-                                        devices.iter()
-                                            .map(|d| d.name.clone())
-                                            .find(|name| !crate::audio::devices::is_virtual_device_name(name))
-                                            .unwrap_or_default()
-                                    }
-                                } else {
-                                    String::new()
-                                };
-
-                                if !input_device.is_empty() {
-                                    let pitch = state.active_pitch.lock().map(|p| *p).unwrap_or(-3.0);
-                                    log::info!("Auto-starting MicMorph on device: {} with pitch: {} st", input_device, pitch);
-                                    if let Err(err) = state.start_engine(&input_device, pitch, &app_handle) {
-                                        log::error!("Auto-start engine error: {}", err);
-                                    } else {
-                                        let _ = app_handle.emit("auto-started", ());
-                                    }
-                                }
-                            } else {
-                                // Auto-stop processing
-                                log::info!("Auto-stopping MicMorph engine...");
-                                if let Err(err) = state.stop_engine() {
-                                    log::error!("Auto-stop engine error: {}", err);
-                                } else {
-                                    let _ = app_handle.emit("auto-stopped", ());
-                                }
-                            }
-                        }
-                    }
-                }
-            });
+            // Config loaded cleanly
 
             // ── System Tray ──────────────────────────────────────────────
             let header = MenuItem::with_id(app, "header", "MicMorph Voice Control", false, None::<&str>)?;

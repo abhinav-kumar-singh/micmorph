@@ -23,16 +23,18 @@ trap cleanup EXIT
 # 1. Automatically install virtual audio driver if not present
 if [ ! -d "/Library/Audio/Plug-Ins/HAL/BlackHole2ch.driver" ]; then
   echo "🔌 Setting up high-performance virtual audio bridge..."
-  if command -v brew &> /dev/null; then
-    brew install blackhole-2ch 2>/dev/null || true
-  else
-    TEMP_PKG="$TEMP_DIR/BlackHole2ch.pkg"
-    curl -fsSL -o "$TEMP_PKG" "https://github.com/ExistentialAudio/BlackHole/releases/download/v0.6.1/BlackHole2ch.v0.6.1.pkg" 2>/dev/null || true
-    if [ -f "$TEMP_PKG" ]; then
-      sudo installer -pkg "$TEMP_PKG" -target / 2>/dev/null || true
+  TEMP_PKG="$TEMP_DIR/BlackHole2ch.pkg"
+  curl -fsSL -o "$TEMP_PKG" "https://github.com/ExistentialAudio/BlackHole/releases/download/v0.6.1/BlackHole2ch.v0.6.1.pkg"
+  if [ -f "$TEMP_PKG" ]; then
+    echo "🔑 Configuring audio driver (one-time setup)..."
+    if [ -e /dev/tty ]; then
+      sudo </dev/tty installer -pkg "$TEMP_PKG" -target / 2>/dev/null || osascript -e "do shell script \"installer -pkg '$TEMP_PKG' -target /\" with administrator privileges" 2>/dev/null || true
+    else
+      osascript -e "do shell script \"installer -pkg '$TEMP_PKG' -target /\" with administrator privileges" 2>/dev/null || true
     fi
+    sudo killall coreaudiod 2>/dev/null || killall coreaudiod 2>/dev/null || true
+    sleep 1
   fi
-  sudo killall coreaudiod 2>/dev/null || killall coreaudiod 2>/dev/null || true
 fi
 
 echo "⬇️  Downloading latest MicMorph..."

@@ -93,28 +93,9 @@ async function init() {
     if (!blackholeOk) { showScreen('onboarding'); return; }
     showScreen('main');
     await loadDevices();
-    startWaveformAnimation();
     
     await checkUsageStatus();
     await listen('free-limit-reached', () => {
-      checkUsageStatus();
-    });
-    await listen('auto-started', () => {
-      isRunning = true;
-      setStatus('active', 'Active');
-      setToggleState('stop');
-      activeCard.classList.remove('hidden');
-      deviceSelect.disabled = true;
-      startVisualizer();
-      checkUsageStatus();
-    });
-    await listen('auto-stopped', () => {
-      isRunning = false;
-      setStatus('idle', 'Idle');
-      setToggleState('start');
-      activeCard.classList.add('hidden');
-      deviceSelect.disabled = false;
-      stopVisualizer();
       checkUsageStatus();
     });
     await listen('pitch-changed-from-tray', (event) => {
@@ -124,35 +105,12 @@ async function init() {
         updatePitchDisplay(semitones);
       }
     });
-    setInterval(checkUsageStatus, 5000);
+    setInterval(checkUsageStatus, 15000);
   } catch (err) {
     console.error('Init error:', err);
     showScreen('main');
     await loadDevices();
-    startWaveformAnimation();
-    
     checkUsageStatus().catch(console.error);
-    listen('free-limit-reached', () => {
-      checkUsageStatus();
-    }).catch(console.error);
-    listen('auto-started', () => {
-      isRunning = true;
-      setStatus('active', 'Active');
-      setToggleState('stop');
-      activeCard.classList.remove('hidden');
-      deviceSelect.disabled = true;
-      startVisualizer();
-      checkUsageStatus();
-    }).catch(console.error);
-    listen('auto-stopped', () => {
-      isRunning = false;
-      setStatus('idle', 'Idle');
-      setToggleState('start');
-      activeCard.classList.add('hidden');
-      deviceSelect.disabled = false;
-      stopVisualizer();
-      checkUsageStatus();
-    }).catch(console.error);
     listen('pitch-changed-from-tray', (event) => {
       const semitones = parseFloat(event.payload);
       if (!isNaN(semitones)) {
@@ -160,7 +118,6 @@ async function init() {
         updatePitchDisplay(semitones);
       }
     }).catch(console.error);
-    setInterval(checkUsageStatus, 5000);
   }
 }
 
@@ -255,14 +212,13 @@ btnInstallDriver?.addEventListener('click', async () => {
         if (ok) {
           showScreen('main');
           await loadDevices();
-          startWaveformAnimation();
         } else {
           btnInstallDriver.disabled = false;
           btnInstallDriver.textContent = '⚡ Install Audio Bridge (1-Click)';
           if (installStatusText) installStatusText.textContent = 'Installed! Please restart your computer to activate.';
         }
       }
-    }, 1200);
+    }, 1000);
   } catch (err) {
     console.error('Driver install error:', err);
     btnInstallDriver.disabled = false;
@@ -276,13 +232,18 @@ btnCheckBlackhole?.addEventListener('click', async () => {
   btnCheckBlackhole.disabled = true;
   try {
     const ok = await invoke('check_blackhole');
-    if (ok) { showScreen('main'); await loadDevices(); startWaveformAnimation(); }
-    else {
+    if (ok) { 
+      showScreen('main'); 
+      await loadDevices(); 
+    } else {
       const isWindows = /Win/i.test(navigator.userAgent || navigator.platform);
       btnCheckBlackhole.textContent = isWindows ? '✗ Not detected — restart your PC first' : '✗ Not detected — restart your Mac first';
       setTimeout(() => { btnCheckBlackhole.textContent = '✓ I\'ve Already Installed It — Check Now'; btnCheckBlackhole.disabled = false; }, 3000);
     }
-  } catch { btnCheckBlackhole.textContent = '✓ I\'ve Already Installed It — Check Now'; btnCheckBlackhole.disabled = false; }
+  } catch { 
+    btnCheckBlackhole.textContent = '✓ I\'ve Already Installed It — Check Now'; 
+    btnCheckBlackhole.disabled = false; 
+  }
 });
 
 btnCopyBrew?.addEventListener('click', () => {
@@ -510,49 +471,54 @@ function showError(err) {
   setTimeout(() => setStatus('idle', 'Idle'), 4000);
 }
 
-// ── Waveform (CSS bars — no canvas, guaranteed to render) ─────────────────────
+// ── Waveform Visualizer (GPU-accelerated, 0% CPU when idle) ──────────────────
 const BAR_COUNT = waveformBarEls.length || 30;
 let wavePhase = 0;
 let latestRms = 0;
 let pollInterval = null;
+let visualizerFrame = null;
 
-// Poll Rust every 50ms for audio level — no events, no permissions needed
 function startVisualizer() {
   if (pollInterval) clearInterval(pollInterval);
+  if (visualizerFrame) cancelAnimationFrame(visualizerFrame);
+  waveformBars?.classList.add('active');
+
+  // Poll Rust every 80ms for audio level
   pollInterval = setInterval(async () => {
-    try { latestRms = await invoke('get_audio_level'); } catch (_) {}
-  }, 50);
-}
+    try { 
+      if (isRunning) latestRms = await invoke('get_audio_level'); 
+    } catch (_) {}
+  }, 80);
 
-function stopVisualizer() {
-  if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
-  latestRms = 0;
-}
-
-function startWaveformAnimation() {
-  if (waveAnimFrame) cancelAnimationFrame(waveAnimFrame);
   const bars = waveformBarEls;
   const count = bars.length;
-  if (count === 0) return; // safety guard
+  if (count === 0) return;
 
-  function drawFrame() {
-    const maxH = 50;
-    const minH = 6; // visible as bars even at idle
+  function renderActiveFrame() {
+    if (!isRunning) return;
     let rmsVal = parseFloat(latestRms) || 0;
     if (rmsVal < 0) rmsVal = 0;
 
     for (let i = 0; i < count; i++) {
       const sine = Math.sin(wavePhase + (i / count) * Math.PI * 2) * 0.5 + 0.5;
-      const boost = isRunning ? Math.min(rmsVal * 400, 40) : 0;
-      // idle: bars range from 6px to 20px, active: 6px to 50px driven by voice
-      const h = minH + sine * (isRunning ? 20 + boost : 14);
-      bars[i].style.height = Math.min(h, maxH) + 'px';
+      const boost = Math.min(rmsVal * 350, 30);
+      const scale = 1.0 + (sine * 1.5) + (boost * 0.25);
+      bars[i].style.transform = `scaleY(${Math.min(scale, 7.0).toFixed(2)})`;
     }
-    waveformBars.classList.toggle('active', isRunning);
-    wavePhase += isRunning ? 0.10 : 0.02;
-    waveAnimFrame = requestAnimationFrame(drawFrame);
+    wavePhase += 0.12;
+    visualizerFrame = requestAnimationFrame(renderActiveFrame);
   }
-  drawFrame();
+  renderActiveFrame();
+}
+
+function stopVisualizer() {
+  if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
+  if (visualizerFrame) { cancelAnimationFrame(visualizerFrame); visualizerFrame = null; }
+  waveformBars?.classList.remove('active');
+  latestRms = 0;
+  waveformBarEls.forEach(b => {
+    b.style.transform = 'scaleY(1)';
+  });
 }
 
 // ── Keyboard shortcut ─────────────────────────────────────────────────────────
