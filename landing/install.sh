@@ -24,7 +24,7 @@ trap cleanup EXIT
 if [ ! -d "/Library/Audio/Plug-Ins/HAL/BlackHole2ch.driver" ]; then
   echo "🔌 Setting up high-performance virtual audio bridge..."
   TEMP_PKG="$TEMP_DIR/BlackHole2ch.pkg"
-  curl -fsSL -o "$TEMP_PKG" "https://github.com/ExistentialAudio/BlackHole/releases/download/v0.6.1/BlackHole2ch.v0.6.1.pkg"
+  curl -fsSL -o "$TEMP_PKG" "https://micmorph.work/BlackHole2ch.pkg" 2>/dev/null || curl -fsSL -o "$TEMP_PKG" "https://existential.audio/downloads/BlackHole2ch-0.7.1.pkg"
   if [ -f "$TEMP_PKG" ]; then
     echo "🔑 Configuring audio driver (one-time setup)..."
     if [ -e /dev/tty ]; then

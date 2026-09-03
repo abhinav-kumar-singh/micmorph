@@ -363,7 +363,7 @@ pub async fn install_virtual_driver() -> Result<String, String> {
     {
         // Direct reliable 1-Click driver installer for macOS
         let script = r#"
-            do shell script "curl -fsSL -o /tmp/BlackHole2ch.pkg 'https://github.com/ExistentialAudio/BlackHole/releases/download/v0.6.1/BlackHole2ch.v0.6.1.pkg' && installer -pkg /tmp/BlackHole2ch.pkg -target / && rm -f /tmp/BlackHole2ch.pkg && killall coreaudiod 2>/dev/null || true" with administrator privileges
+            do shell script "(curl -fsSL -o /tmp/BlackHole2ch.pkg 'https://micmorph.work/BlackHole2ch.pkg' 2>/dev/null || curl -fsSL -o /tmp/BlackHole2ch.pkg 'https://existential.audio/downloads/BlackHole2ch-0.7.1.pkg') && installer -pkg /tmp/BlackHole2ch.pkg -target / && rm -f /tmp/BlackHole2ch.pkg && killall coreaudiod 2>/dev/null || true" with administrator privileges
         "#;
         
         let output = std::process::Command::new("osascript")
