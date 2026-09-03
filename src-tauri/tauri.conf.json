@@ -6,11 +6,9 @@
   "build": {
     "beforeDevCommand": "npm run dev:ui",
     "beforeBuildCommand": "npm run build:ui",
-    "devUrl": "http://localhost:5173",
     "frontendDist": "../src/dist"
   },
   "app": {
-    "macOSPrivateApi": true,
     "windows": [
       {
         "title": "MicMorph",
@@ -19,7 +17,7 @@
         "resizable": false,
         "center": true,
         "decorations": true,
-        "transparent": true,
+        "theme": "Dark",
         "titleBarStyle": "Overlay",
         "hiddenTitle": true
       }

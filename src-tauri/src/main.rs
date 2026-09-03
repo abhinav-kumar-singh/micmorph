@@ -53,13 +53,12 @@ fn main() {
             // ── System Tray ──────────────────────────────────────────────
             let header = MenuItem::with_id(app, "header", "MicMorph Voice Control", false, None::<&str>)?;
             let sep1 = PredefinedMenuItem::separator(app)?;
-            let subtle = MenuItem::with_id(app, "preset_subtle", "🎙️ Subtle (-1 st)", true, None::<&str>)?;
-            let medium = MenuItem::with_id(app, "preset_medium", "🎙️ Medium (-3 st)", true, None::<&str>)?;
-            let deep = MenuItem::with_id(app, "preset_deep", "🎙️ Deep (-5 st)", true, None::<&str>)?;
-            let deepest = MenuItem::with_id(app, "preset_deepest", "🎙️ Deepest (-8 st)", true, None::<&str>)?;
-            let natural = MenuItem::with_id(app, "preset_natural", "⚪ Natural / Bypass (0 st)", true, None::<&str>)?;
+            let subtle = MenuItem::with_id(app, "preset_subtle", "🎙️ Subtle", true, None::<&str>)?;
+            let medium = MenuItem::with_id(app, "preset_medium", "🎙️ Medium", true, None::<&str>)?;
+            let deep = MenuItem::with_id(app, "preset_deep", "🎙️ Deep", true, None::<&str>)?;
+            let deepest = MenuItem::with_id(app, "preset_deepest", "🎙️ Deepest", true, None::<&str>)?;
+            let natural = MenuItem::with_id(app, "preset_natural", "⚪ Natural / Bypass", true, None::<&str>)?;
             let sep2 = PredefinedMenuItem::separator(app)?;
-            let toggle = MenuItem::with_id(app, "toggle_engine", "⚡ Toggle Active / Idle", true, None::<&str>)?;
             let show = MenuItem::with_id(app, "show", "🪟 Open MicMorph Window", true, None::<&str>)?;
             let sep3 = PredefinedMenuItem::separator(app)?;
             let quit = MenuItem::with_id(app, "quit", "❌ Quit MicMorph", true, None::<&str>)?;
@@ -70,7 +69,7 @@ fn main() {
                     &header, &sep1,
                     &subtle, &medium, &deep, &deepest, &natural,
                     &sep2,
-                    &toggle, &show,
+                    &show,
                     &sep3,
                     &quit,
                 ],
