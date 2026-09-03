@@ -10,6 +10,7 @@
     "frontendDist": "../src/dist"
   },
   "app": {
+    "macOSPrivateApi": true,
     "windows": [
       {
         "title": "MicMorph",
@@ -18,7 +19,7 @@
         "resizable": false,
         "center": true,
         "decorations": true,
-        "theme": "Dark",
+        "transparent": true,
         "titleBarStyle": "Overlay",
         "hiddenTitle": true
       }

@@ -10,7 +10,17 @@ window.invoke = invoke;
 let isRunning = false;
 let currentPitch = -3;
 let selectedDevice = '';
-let waveAnimFrame = null;
+let currentMode = 'male';
+
+// ── DOM Elements (initialized in initDOM) ─────────────────────────────────────
+let screenOnboarding, screenMain, appHeader, statusBadge, statusLabel;
+let deviceSelect, pitchSlider, pitchValueDisplay, activeCard;
+let btnToggle, btnToggleLabel, btnIcon, outputDeviceName;
+let waveformBars, waveformBarEls = [];
+let btnCheckBlackhole, btnCopyBrew, presetBtns = [];
+let previewToggle, btnStyleMale, btnStyleFemale;
+let sliderLabelLeft, sliderLabelRight, usageTimeLeft, limitCard;
+let meetSelectHint, usageBadge, btnInstallDriver, installStatusText;
 
 // ── Anonymous Telemetry (PostHog) ─────────────────────────────────────────────
 async function trackEvent(eventName, properties = {}) {
@@ -45,34 +55,6 @@ async function trackEvent(eventName, properties = {}) {
   }
 }
 
-// ── DOM Elements ──────────────────────────────────────────────────────────────
-const screenOnboarding  = document.getElementById('screen-onboarding');
-const screenMain        = document.getElementById('screen-main');
-const appHeader         = document.querySelector('.app-header');
-const statusBadge       = document.getElementById('status-badge');
-const statusLabel       = document.getElementById('status-label');
-const deviceSelect      = document.getElementById('device-select');
-const pitchSlider       = document.getElementById('pitch-slider');
-const pitchValueDisplay = document.getElementById('pitch-value-display');
-const activeCard        = document.getElementById('active-card');
-const btnToggle         = document.getElementById('btn-toggle');
-const btnToggleLabel    = document.getElementById('btn-toggle-label');
-const btnIcon           = btnToggle.querySelector('.btn-icon');
-const outputDeviceName  = document.getElementById('output-device-name');
-const waveformBars      = document.getElementById('waveform-bars');
-const waveformBarEls    = waveformBars ? Array.from(waveformBars.querySelectorAll('span')) : [];
-const btnCheckBlackhole = document.getElementById('btn-check-blackhole');
-const btnCopyBrew       = document.getElementById('btn-copy-brew');
-const presetBtns        = document.querySelectorAll('.preset-btn');
-const previewToggle     = document.getElementById('preview-toggle');
-const btnStyleMale       = document.getElementById('btn-style-male');
-const btnStyleFemale     = document.getElementById('btn-style-female');
-const sliderLabelLeft    = document.getElementById('slider-label-left');
-const sliderLabelRight   = document.getElementById('slider-label-right');
-const usageTimeLeft     = document.getElementById('usage-time-left');
-const limitCard         = document.getElementById('limit-card');
-const meetSelectHint    = document.getElementById('meet-select-hint');
-
 function updateOutputDeviceLabels() {
   const isWindows = /Win/i.test(navigator.userAgent || navigator.platform);
   if (isWindows) {
@@ -101,7 +83,7 @@ async function init() {
     await listen('pitch-changed-from-tray', (event) => {
       const semitones = parseFloat(event.payload);
       if (!isNaN(semitones)) {
-        pitchSlider.value = semitones;
+        if (pitchSlider) pitchSlider.value = semitones;
         updatePitchDisplay(semitones);
       }
     });
@@ -114,7 +96,7 @@ async function init() {
     listen('pitch-changed-from-tray', (event) => {
       const semitones = parseFloat(event.payload);
       if (!isNaN(semitones)) {
-        pitchSlider.value = semitones;
+        if (pitchSlider) pitchSlider.value = semitones;
         updatePitchDisplay(semitones);
       }
     }).catch(console.error);
@@ -130,8 +112,6 @@ async function checkUsageStatus() {
   }
 }
 
-const usageBadge        = document.getElementById('usage-badge');
-
 function updateUsageUI(status) {
   usageBadge?.classList.add('hidden');
   limitCard?.classList.add('hidden');
@@ -139,8 +119,8 @@ function updateUsageUI(status) {
 
 // ── Screen Management ─────────────────────────────────────────────────────────
 function showScreen(name) {
-  screenOnboarding.classList.add('hidden');
-  screenMain.classList.add('hidden');
+  screenOnboarding?.classList.add('hidden');
+  screenMain?.classList.add('hidden');
   if (name === 'onboarding') {
     const isWindows = /Win/i.test(navigator.userAgent || navigator.platform);
     const step1Title = document.getElementById('step1-title');
@@ -178,88 +158,15 @@ function showScreen(name) {
       if (step3Title) step3Title.textContent = 'Return to MicMorph';
       if (step3Desc) step3Desc.textContent = 'Come back and click the button below — we\'ll detect BlackHole automatically.';
     }
-    screenOnboarding.classList.remove('hidden');
+    screenOnboarding?.classList.remove('hidden');
   } else {
-    screenMain.classList.remove('hidden');
+    screenMain?.classList.remove('hidden');
   }
 }
 
-// ── Onboarding ────────────────────────────────────────────────────────────────
-const btnInstallDriver = document.getElementById('btn-install-driver');
-const installStatusText = document.getElementById('install-status-text');
-
-btnInstallDriver?.addEventListener('click', async () => {
-  btnInstallDriver.disabled = true;
-  btnInstallDriver.textContent = '⏳ Configuring Audio Bridge...';
-  if (installStatusText) {
-    const isWindows = /Win/i.test(navigator.userAgent || navigator.platform);
-    installStatusText.textContent = isWindows 
-      ? 'Please click "Yes" on the Windows administrator prompt...' 
-      : 'Please confirm with Touch ID or enter your Mac password...';
-  }
-
-  try {
-    const res = await invoke('install_virtual_driver');
-    console.log('Install result:', res);
-    if (installStatusText) installStatusText.textContent = '✓ Driver installed! Detecting audio bridge...';
-    
-    let attempts = 0;
-    const interval = setInterval(async () => {
-      attempts++;
-      const ok = await invoke('check_blackhole');
-      if (ok || attempts > 8) {
-        clearInterval(interval);
-        if (ok) {
-          showScreen('main');
-          await loadDevices();
-        } else {
-          btnInstallDriver.disabled = false;
-          btnInstallDriver.textContent = '⚡ Install Audio Bridge (1-Click)';
-          if (installStatusText) installStatusText.textContent = 'Installed! Please restart your computer to activate.';
-        }
-      }
-    }, 1000);
-  } catch (err) {
-    console.error('Driver install error:', err);
-    btnInstallDriver.disabled = false;
-    btnInstallDriver.textContent = '⚡ Try Again (1-Click Install)';
-    if (installStatusText) installStatusText.textContent = 'Installation was canceled or failed. You can also use manual setup below.';
-  }
-});
-
-btnCheckBlackhole?.addEventListener('click', async () => {
-  btnCheckBlackhole.textContent = 'Checking...';
-  btnCheckBlackhole.disabled = true;
-  try {
-    const ok = await invoke('check_blackhole');
-    if (ok) { 
-      showScreen('main'); 
-      await loadDevices(); 
-    } else {
-      const isWindows = /Win/i.test(navigator.userAgent || navigator.platform);
-      btnCheckBlackhole.textContent = isWindows ? '✗ Not detected — restart your PC first' : '✗ Not detected — restart your Mac first';
-      setTimeout(() => { btnCheckBlackhole.textContent = '✓ I\'ve Already Installed It — Check Now'; btnCheckBlackhole.disabled = false; }, 3000);
-    }
-  } catch { 
-    btnCheckBlackhole.textContent = '✓ I\'ve Already Installed It — Check Now'; 
-    btnCheckBlackhole.disabled = false; 
-  }
-});
-
-btnCopyBrew?.addEventListener('click', () => {
-  navigator.clipboard.writeText('brew install blackhole-2ch').then(() => {
-    btnCopyBrew.textContent = '✅';
-    setTimeout(() => { btnCopyBrew.textContent = '📋'; }, 2000);
-  });
-});
-
-// ── Window Dragging ───────────────────────────────────────────────────────────
-appHeader?.addEventListener('mousedown', (e) => {
-  if (e.button === 0) { e.preventDefault(); appWindow.startDragging(); }
-});
-
 // ── Device Loading ────────────────────────────────────────────────────────────
 async function loadDevices() {
+  if (!deviceSelect) return;
   try {
     const devices = await invoke('get_input_devices');
     const defaultDevice = await invoke('get_default_input_device');
@@ -286,25 +193,13 @@ async function loadDevices() {
   }
 }
 
-deviceSelect.addEventListener('change', () => { selectedDevice = deviceSelect.value; });
-
 // ── Voice Style Selection (Masculine / Feminine) ──────────────────────────────
-let currentMode = 'male';
-
-btnStyleMale?.addEventListener('click', () => {
-  if (currentMode === 'male') return;
-  setVoiceMode('male');
-});
-
-btnStyleFemale?.addEventListener('click', () => {
-  if (currentMode === 'female') return;
-  setVoiceMode('female');
-});
-
 function setVoiceMode(mode) {
   currentMode = mode;
   btnStyleMale?.classList.toggle('active', mode === 'male');
   btnStyleFemale?.classList.toggle('active', mode === 'female');
+
+  if (!pitchSlider) return;
 
   if (mode === 'male') {
     pitchSlider.min = '-8';
@@ -357,60 +252,26 @@ async function sendPitchChange(val) {
   }
 }
 
-// ── Pitch Slider ──────────────────────────────────────────────────────────────
+// ── Pitch Display ─────────────────────────────────────────────────────────────
 function updatePitchDisplay(value) {
   const semitones = parseFloat(value);
   currentPitch = semitones;
-  pitchValueDisplay.textContent = `${semitones} st`;
-  presetBtns.forEach(btn => btn.classList.toggle('active', parseFloat(btn.dataset.semitones) === semitones));
+  if (pitchValueDisplay) pitchValueDisplay.textContent = `${semitones} st`;
+  presetBtns.forEach(btn => btn?.classList?.toggle('active', parseFloat(btn.dataset?.semitones) === semitones));
 }
 
-pitchSlider.addEventListener('input', async (e) => {
-  updatePitchDisplay(e.target.value);
-  try { await invoke('set_pitch', { semitones: parseFloat(e.target.value) }); }
-  catch (err) { console.error('Failed to update pitch:', err); }
-});
-
-presetBtns.forEach(btn => {
-  btn.addEventListener('click', async () => {
-    const semitones = parseFloat(btn.dataset.semitones);
-    pitchSlider.value = semitones;
-    updatePitchDisplay(semitones);
-    try { await invoke('set_pitch', { semitones }); }
-    catch (err) { console.error('Failed to update pitch from preset:', err); }
-  });
-});
-
-updatePitchDisplay(pitchSlider.value);
-
-previewToggle?.addEventListener('change', async (e) => {
-  const enabled = e.target.checked;
-  try {
-    await invoke('toggle_preview', { enabled });
-  } catch (err) {
-    console.error('Failed to toggle preview:', err);
-    e.target.checked = !enabled;
-  }
-});
-
-// ── Toggle Button ─────────────────────────────────────────────────────────────
-btnToggle.addEventListener('click', async () => {
-  if (!isRunning) await startProcessing();
-  else await stopProcessing();
-  await checkUsageStatus().catch(console.error);
-});
-
+// ── Processing Control ────────────────────────────────────────────────────────
 async function startProcessing() {
   if (!selectedDevice) { setStatus('error', 'No mic selected'); return; }
   setStatus('loading', 'Starting...');
-  btnToggle.disabled = true;
+  if (btnToggle) btnToggle.disabled = true;
   try {
     await invoke('start_processing', { inputDevice: selectedDevice, pitchSemitones: currentPitch });
     isRunning = true;
     setStatus('active', 'Active');
     setToggleState('stop');
-    activeCard.classList.remove('hidden');
-    deviceSelect.disabled = true;
+    activeCard?.classList.remove('hidden');
+    if (deviceSelect) deviceSelect.disabled = true;
     trackEvent('morph_started', { pitch: currentPitch });
     
     if (previewToggle) {
@@ -423,56 +284,58 @@ async function startProcessing() {
     setStatus('error', 'Error');
     showError(err);
   } finally {
-    btnToggle.disabled = false;
+    if (btnToggle) btnToggle.disabled = false;
   }
 }
 
 async function stopProcessing() {
   setStatus('loading', 'Stopping...');
-  btnToggle.disabled = true;
+  if (btnToggle) btnToggle.disabled = true;
   try {
     await invoke('stop_processing');
     isRunning = false;
     setStatus('idle', 'Idle');
     setToggleState('start');
-    activeCard.classList.add('hidden');
-    deviceSelect.disabled = false;
+    activeCard?.classList.add('hidden');
+    if (deviceSelect) deviceSelect.disabled = false;
     stopVisualizer();
   } catch (err) {
     console.error('Failed to stop:', err);
     setStatus('error', 'Error');
   } finally {
-    btnToggle.disabled = false;
+    if (btnToggle) btnToggle.disabled = false;
   }
 }
 
 // ── Status & Toggle Helpers ───────────────────────────────────────────────────
 function setStatus(type, label) {
+  if (!statusBadge || !statusLabel) return;
   statusBadge.className = 'status-badge';
   statusBadge.classList.add(`status-${type}`);
   statusLabel.textContent = label;
 }
 
 function setToggleState(state) {
+  if (!btnToggle || !btnToggleLabel) return;
   if (state === 'stop') {
     btnToggle.className = 'btn-toggle btn-stop';
-    btnIcon.textContent = '■';
+    if (btnIcon) btnIcon.textContent = '■';
     btnToggleLabel.textContent = 'Stop MicMorph';
   } else {
     btnToggle.className = 'btn-toggle btn-start';
-    btnIcon.textContent = '▶';
+    if (btnIcon) btnIcon.textContent = '▶';
     btnToggleLabel.textContent = 'Start MicMorph';
   }
 }
 
 function showError(err) {
+  if (!statusLabel) return;
   const msg = typeof err === 'string' ? err : JSON.stringify(err);
   statusLabel.textContent = msg.length > 30 ? msg.slice(0, 30) + '...' : msg;
   setTimeout(() => setStatus('idle', 'Idle'), 4000);
 }
 
 // ── Waveform Visualizer (GPU-accelerated, 0% CPU when idle) ──────────────────
-const BAR_COUNT = waveformBarEls.length || 30;
 let wavePhase = 0;
 let latestRms = 0;
 let pollInterval = null;
@@ -521,13 +384,190 @@ function stopVisualizer() {
   });
 }
 
-// ── Keyboard shortcut ─────────────────────────────────────────────────────────
-document.addEventListener('keydown', (e) => {
-  if (e.code === 'Space' && e.target === document.body) {
-    e.preventDefault();
-    btnToggle.click();
-  }
-});
+// ── Initialize DOM References ────────────────────────────────────────────────
+function initDOM() {
+  screenOnboarding  = document.getElementById('screen-onboarding');
+  screenMain        = document.getElementById('screen-main');
+  appHeader         = document.querySelector('.app-header');
+  statusBadge       = document.getElementById('status-badge');
+  statusLabel       = document.getElementById('status-label');
+  deviceSelect      = document.getElementById('device-select');
+  pitchSlider       = document.getElementById('pitch-slider');
+  pitchValueDisplay = document.getElementById('pitch-value-display');
+  activeCard        = document.getElementById('active-card');
+  btnToggle         = document.getElementById('btn-toggle');
+  btnToggleLabel    = document.getElementById('btn-toggle-label');
+  btnIcon           = btnToggle?.querySelector('.btn-icon');
+  outputDeviceName  = document.getElementById('output-device-name');
+  waveformBars      = document.getElementById('waveform-bars');
+  waveformBarEls    = waveformBars ? Array.from(waveformBars.querySelectorAll('span')) : [];
+  btnCheckBlackhole = document.getElementById('btn-check-blackhole');
+  btnCopyBrew       = document.getElementById('btn-copy-brew');
+  presetBtns        = Array.from(document.querySelectorAll('.preset-btn'));
+  previewToggle     = document.getElementById('preview-toggle');
+  btnStyleMale      = document.getElementById('btn-style-male');
+  btnStyleFemale    = document.getElementById('btn-style-female');
+  sliderLabelLeft   = document.getElementById('slider-label-left');
+  sliderLabelRight  = document.getElementById('slider-label-right');
+  usageTimeLeft     = document.getElementById('usage-time-left');
+  limitCard         = document.getElementById('limit-card');
+  meetSelectHint    = document.getElementById('meet-select-hint');
+  usageBadge        = document.getElementById('usage-badge');
+  btnInstallDriver  = document.getElementById('btn-install-driver');
+  installStatusText = document.getElementById('install-status-text');
+}
 
-// ── Boot ──────────────────────────────────────────────────────────────────────
-init();
+// ── Attach Event Listeners Safely ─────────────────────────────────────────────
+function attachEventListeners() {
+  btnInstallDriver?.addEventListener('click', async () => {
+    btnInstallDriver.disabled = true;
+    btnInstallDriver.textContent = '⏳ Configuring Audio Bridge...';
+    if (installStatusText) {
+      const isWindows = /Win/i.test(navigator.userAgent || navigator.platform);
+      installStatusText.textContent = isWindows 
+        ? 'Please click "Yes" on the Windows administrator prompt...' 
+        : 'Please confirm with Touch ID or enter your Mac password...';
+    }
+
+    try {
+      const res = await invoke('install_virtual_driver');
+      console.log('Install result:', res);
+      if (installStatusText) installStatusText.textContent = '✓ Driver installed! Detecting audio bridge...';
+      
+      let attempts = 0;
+      const interval = setInterval(async () => {
+        attempts++;
+        const ok = await invoke('check_blackhole');
+        if (ok || attempts > 8) {
+          clearInterval(interval);
+          if (ok) {
+            showScreen('main');
+            await loadDevices();
+          } else {
+            btnInstallDriver.disabled = false;
+            btnInstallDriver.textContent = '⚡ Install Audio Bridge (1-Click)';
+            if (installStatusText) installStatusText.textContent = 'Installed! Please restart your computer to activate.';
+          }
+        }
+      }, 1000);
+    } catch (err) {
+      console.error('Driver install error:', err);
+      btnInstallDriver.disabled = false;
+      btnInstallDriver.textContent = '⚡ Try Again (1-Click Install)';
+      if (installStatusText) installStatusText.textContent = 'Installation was canceled or failed. You can also use manual setup below.';
+    }
+  });
+
+  btnCheckBlackhole?.addEventListener('click', async () => {
+    btnCheckBlackhole.textContent = 'Checking...';
+    btnCheckBlackhole.disabled = true;
+    try {
+      const ok = await invoke('check_blackhole');
+      if (ok) { 
+        showScreen('main'); 
+        await loadDevices(); 
+      } else {
+        const isWindows = /Win/i.test(navigator.userAgent || navigator.platform);
+        btnCheckBlackhole.textContent = isWindows ? '✗ Not detected — restart your PC first' : '✗ Not detected — restart your Mac first';
+        setTimeout(() => { 
+          if (btnCheckBlackhole) {
+            btnCheckBlackhole.textContent = '✓ I\'ve Already Installed It — Check Now'; 
+            btnCheckBlackhole.disabled = false; 
+          }
+        }, 3000);
+      }
+    } catch { 
+      if (btnCheckBlackhole) {
+        btnCheckBlackhole.textContent = '✓ I\'ve Already Installed It — Check Now'; 
+        btnCheckBlackhole.disabled = false; 
+      }
+    }
+  });
+
+  btnCopyBrew?.addEventListener('click', () => {
+    navigator.clipboard.writeText('brew install blackhole-2ch').then(() => {
+      if (btnCopyBrew) {
+        btnCopyBrew.textContent = '✅';
+        setTimeout(() => { if (btnCopyBrew) btnCopyBrew.textContent = '📋'; }, 2000);
+      }
+    });
+  });
+
+  appHeader?.addEventListener('mousedown', (e) => {
+    if (e.button === 0) { e.preventDefault(); appWindow.startDragging(); }
+  });
+
+  deviceSelect?.addEventListener('change', () => { 
+    if (deviceSelect) selectedDevice = deviceSelect.value; 
+  });
+
+  btnStyleMale?.addEventListener('click', () => {
+    if (currentMode === 'male') return;
+    setVoiceMode('male');
+  });
+
+  btnStyleFemale?.addEventListener('click', () => {
+    if (currentMode === 'female') return;
+    setVoiceMode('female');
+  });
+
+  pitchSlider?.addEventListener('input', async (e) => {
+    updatePitchDisplay(e.target.value);
+    try { await invoke('set_pitch', { semitones: parseFloat(e.target.value) }); }
+    catch (err) { console.error('Failed to update pitch:', err); }
+  });
+
+  presetBtns.forEach(btn => {
+    btn?.addEventListener('click', async () => {
+      const semitones = parseFloat(btn.dataset.semitones);
+      if (pitchSlider) pitchSlider.value = semitones;
+      updatePitchDisplay(semitones);
+      try { await invoke('set_pitch', { semitones }); }
+      catch (err) { console.error('Failed to update pitch from preset:', err); }
+    });
+  });
+
+  if (pitchSlider) {
+    updatePitchDisplay(pitchSlider.value);
+  }
+
+  previewToggle?.addEventListener('change', async (e) => {
+    const enabled = e.target.checked;
+    try {
+      await invoke('toggle_preview', { enabled });
+    } catch (err) {
+      console.error('Failed to toggle preview:', err);
+      e.target.checked = !enabled;
+    }
+  });
+
+  btnToggle?.addEventListener('click', async () => {
+    if (!isRunning) await startProcessing();
+    else await stopProcessing();
+    await checkUsageStatus().catch(console.error);
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.code === 'Space' && e.target === document.body) {
+      e.preventDefault();
+      btnToggle?.click();
+    }
+  });
+}
+
+// ── Safe Boot Lifecycle ───────────────────────────────────────────────────────
+function startApp() {
+  try {
+    initDOM();
+    attachEventListeners();
+    init();
+  } catch (err) {
+    console.error('Fatal initialization error:', err);
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', startApp);
+} else {
+  startApp();
+}
