@@ -12,8 +12,8 @@
     "windows": [
       {
         "title": "MicMorph",
-        "width": 420,
-        "height": 980,
+        "width": 540,
+        "height": 680,
         "resizable": false,
         "center": true,
         "decorations": true,

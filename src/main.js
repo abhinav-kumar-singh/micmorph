@@ -11,6 +11,7 @@ let isRunning = false;
 let currentPitch = -3;
 let selectedDevice = '';
 let currentMode = 'male';
+let morphStartTime = null;
 
 // ── DOM Elements (initialized in initDOM) ─────────────────────────────────────
 let screenOnboarding, screenMain, appHeader, statusBadge, statusLabel;
@@ -21,6 +22,7 @@ let btnCheckBlackhole, btnCopyBrew, presetBtns = [];
 let previewToggle, btnStyleMale, btnStyleFemale;
 let sliderLabelLeft, sliderLabelRight, usageTimeLeft, limitCard;
 let meetSelectHint, usageBadge, btnInstallDriver, installStatusText;
+let btnThemeToggle, themeIcon, previewStatusPill;
 
 // ── Anonymous Telemetry (PostHog) ─────────────────────────────────────────────
 async function trackEvent(eventName, properties = {}) {
@@ -252,7 +254,32 @@ async function sendPitchChange(val) {
   }
 }
 
-// ── Pitch Display ─────────────────────────────────────────────────────────────
+// ── Pitch Telemetry & Display ──────────────────────────────────────────────────
+function onPitchSelected(semitones, triggerType, presetName = null) {
+  const oldPitch = currentPitch;
+
+  // If morph is actively running, log talk duration segment on the previous pitch
+  if (isRunning && morphStartTime) {
+    const durationSec = Math.max(1, Math.round((Date.now() - morphStartTime) / 1000));
+    trackEvent('morph_duration_segment', {
+      pitch: oldPitch,
+      pitch_label: `${oldPitch} st`,
+      voice_mode: currentMode,
+      duration_seconds: durationSec
+    });
+    morphStartTime = Date.now(); // reset timer for new pitch
+  }
+
+  trackEvent('voice_pitch_selected', {
+    pitch: semitones,
+    pitch_label: `${semitones} st`,
+    preset_name: presetName || 'Custom Slider',
+    trigger: triggerType, // 'preset_button' or 'slider'
+    voice_mode: currentMode,
+    is_running: isRunning
+  });
+}
+
 function updatePitchDisplay(value) {
   const semitones = parseFloat(value);
   currentPitch = semitones;
@@ -268,11 +295,17 @@ async function startProcessing() {
   try {
     await invoke('start_processing', { inputDevice: selectedDevice, pitchSemitones: currentPitch });
     isRunning = true;
+    morphStartTime = Date.now();
     setStatus('active', 'Active');
     setToggleState('stop');
     activeCard?.classList.remove('hidden');
     if (deviceSelect) deviceSelect.disabled = true;
-    trackEvent('morph_started', { pitch: currentPitch });
+    trackEvent('morph_started', {
+      pitch: currentPitch,
+      pitch_label: `${currentPitch} st`,
+      voice_mode: currentMode,
+      input_device: selectedDevice
+    });
     
     if (previewToggle) {
       try { await invoke('toggle_preview', { enabled: previewToggle.checked }); } catch (_) {}
@@ -294,6 +327,16 @@ async function stopProcessing() {
   try {
     await invoke('stop_processing');
     isRunning = false;
+    if (morphStartTime) {
+      const durationSec = Math.max(1, Math.round((Date.now() - morphStartTime) / 1000));
+      trackEvent('morph_stopped', {
+        pitch: currentPitch,
+        pitch_label: `${currentPitch} st`,
+        voice_mode: currentMode,
+        duration_seconds: durationSec
+      });
+      morphStartTime = null;
+    }
     setStatus('idle', 'Idle');
     setToggleState('start');
     activeCard?.classList.add('hidden');
@@ -415,10 +458,38 @@ function initDOM() {
   usageBadge        = document.getElementById('usage-badge');
   btnInstallDriver  = document.getElementById('btn-install-driver');
   installStatusText = document.getElementById('install-status-text');
+  btnThemeToggle    = document.getElementById('btn-theme-toggle');
+  themeIcon         = document.getElementById('theme-icon');
+  previewStatusPill = document.getElementById('preview-status-pill');
+}
+
+// ── Theme Management ──────────────────────────────────────────────────────────
+function initTheme() {
+  const saved = localStorage.getItem('mm_theme') || 'dark';
+  applyTheme(saved);
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('mm_theme', theme);
+  if (themeIcon) {
+    themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+  }
+  if (btnThemeToggle) {
+    btnThemeToggle.setAttribute('title', theme === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme');
+  }
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'dark';
+  const next = current === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+  trackEvent('theme_toggled', { theme: next });
 }
 
 // ── Attach Event Listeners Safely ─────────────────────────────────────────────
 function attachEventListeners() {
+  btnThemeToggle?.addEventListener('click', toggleTheme);
   btnInstallDriver?.addEventListener('click', async () => {
     btnInstallDriver.disabled = true;
     btnInstallDriver.textContent = '⏳ Configuring Audio Bridge...';
@@ -498,17 +569,22 @@ function attachEventListeners() {
   });
 
   deviceSelect?.addEventListener('change', () => { 
-    if (deviceSelect) selectedDevice = deviceSelect.value; 
+    if (deviceSelect) {
+      selectedDevice = deviceSelect.value;
+      trackEvent('device_selected', { device: selectedDevice });
+    }
   });
 
   btnStyleMale?.addEventListener('click', () => {
     if (currentMode === 'male') return;
     setVoiceMode('male');
+    trackEvent('voice_mode_changed', { mode: 'male', pitch: currentPitch });
   });
 
   btnStyleFemale?.addEventListener('click', () => {
     if (currentMode === 'female') return;
     setVoiceMode('female');
+    trackEvent('voice_mode_changed', { mode: 'female', pitch: currentPitch });
   });
 
   pitchSlider?.addEventListener('input', async (e) => {
@@ -517,11 +593,18 @@ function attachEventListeners() {
     catch (err) { console.error('Failed to update pitch:', err); }
   });
 
+  pitchSlider?.addEventListener('change', (e) => {
+    const semitones = parseFloat(e.target.value);
+    onPitchSelected(semitones, 'slider', null);
+  });
+
   presetBtns.forEach(btn => {
     btn?.addEventListener('click', async () => {
       const semitones = parseFloat(btn.dataset.semitones);
+      const presetLabel = btn.textContent.trim();
       if (pitchSlider) pitchSlider.value = semitones;
       updatePitchDisplay(semitones);
+      onPitchSelected(semitones, 'preset_button', presetLabel);
       try { await invoke('set_pitch', { semitones }); }
       catch (err) { console.error('Failed to update pitch from preset:', err); }
     });
@@ -533,11 +616,23 @@ function attachEventListeners() {
 
   previewToggle?.addEventListener('change', async (e) => {
     const enabled = e.target.checked;
+    trackEvent('preview_toggled', { enabled, pitch: currentPitch, voice_mode: currentMode });
+    if (previewStatusPill) {
+      previewStatusPill.textContent = enabled ? 'LIVE' : 'OFF';
+      previewStatusPill.classList.toggle('active', enabled);
+    }
+    const card = document.getElementById('preview-section-card');
+    if (card) card.classList.toggle('preview-active', enabled);
     try {
       await invoke('toggle_preview', { enabled });
     } catch (err) {
       console.error('Failed to toggle preview:', err);
       e.target.checked = !enabled;
+      if (previewStatusPill) {
+        previewStatusPill.textContent = !enabled ? 'LIVE' : 'OFF';
+        previewStatusPill.classList.toggle('active', !enabled);
+      }
+      if (card) card.classList.toggle('preview-active', !enabled);
     }
   });
 
@@ -553,12 +648,26 @@ function attachEventListeners() {
       btnToggle?.click();
     }
   });
+
+  window.addEventListener('beforeunload', () => {
+    if (isRunning && morphStartTime) {
+      const durationSec = Math.max(1, Math.round((Date.now() - morphStartTime) / 1000));
+      trackEvent('morph_stopped', {
+        pitch: currentPitch,
+        pitch_label: `${currentPitch} st`,
+        voice_mode: currentMode,
+        duration_seconds: durationSec,
+        exit_type: 'window_closed'
+      });
+    }
+  });
 }
 
 // ── Safe Boot Lifecycle ───────────────────────────────────────────────────────
 function startApp() {
   try {
     initDOM();
+    initTheme();
     attachEventListeners();
     init();
   } catch (err) {

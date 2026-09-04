@@ -1,21 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="color-scheme" content="dark" />
   <title>MicMorph — Voice Pitch Tuning</title>
   <meta name="description" content="Real-time voice pitch tuning for Mac. Sound more confident on every call." />
   <style>
     html, body {
-      background: #0c0e16 !important;
-      background-color: #0c0e16 !important;
-      color: #f1f5f9 !important;
       margin: 0;
       padding: 0;
       width: 100%;
       height: 100%;
       overflow: hidden;
+    }
+    :root, [data-theme="dark"] {
+      background-color: #121214;
+      color: #fafafa;
+    }
+    [data-theme="light"] {
+      background-color: #e8edf5;
+      color: #18181b;
     }
   </style>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -23,7 +27,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body style="background: #0c0e16 !important; background-color: #0c0e16 !important; color: #f1f5f9;">
+<body>
 
   <!-- ── Onboarding Screen ──────────── -->
   <div id="screen-onboarding" class="screen hidden">
@@ -32,14 +36,14 @@
       <h1 id="onboard-title">Welcome to MicMorph</h1>
       <p id="onboard-subtitle" class="onboard-subtitle">One quick setup step to enable real-time voice tuning.</p>
 
-      <div class="onboard-action-box" style="margin: 20px 0; text-align: center;">
-        <button id="btn-install-driver" class="btn-primary" style="width: 100%; justify-content: center; padding: 14px 20px; font-size: 14px; font-weight: 700; box-shadow: 0 4px 20px rgba(249, 115, 22, 0.4);">
+      <div class="onboard-action-box">
+        <button id="btn-install-driver" class="btn-primary">
           ⚡ Install Audio Bridge (1-Click)
         </button>
-        <p id="install-status-text" style="font-size: 11px; color: var(--text-muted); margin-top: 10px; min-height: 16px;"></p>
+        <p id="install-status-text" class="install-status-text"></p>
       </div>
 
-      <div id="manual-setup-details" style="border-top: 1px solid var(--border-color); padding-top: 16px; margin-top: 10px;">
+      <div id="manual-setup-details" class="manual-setup-details">
         <div class="setup-step">
           <div class="step-badge">1</div>
           <div class="step-content">
@@ -52,7 +56,7 @@
           </div>
         </div>
 
-        <div class="setup-step" style="margin-top: 12px;">
+        <div class="setup-step">
           <div class="step-badge">2</div>
           <div class="step-content">
             <h3 id="step2-title">Restart Your Device</h3>
@@ -61,7 +65,7 @@
         </div>
       </div>
 
-      <button id="btn-check-blackhole" class="btn-secondary" style="margin-top: 14px; width: 100%; justify-content: center; font-size: 12px;">
+      <button id="btn-check-blackhole" class="btn-secondary">
         ✓ I've Already Installed It — Check Now
       </button>
     </div>
@@ -77,6 +81,9 @@
         <span class="logo-text">MicMorph</span>
       </div>
       <div class="header-badges">
+        <button id="btn-theme-toggle" class="btn-theme-toggle" title="Switch Theme (Light / Dark)" aria-label="Toggle Theme">
+          <span id="theme-icon" class="theme-icon">🌙</span>
+        </button>
         <div id="usage-badge" class="usage-badge hidden" title="Remaining free daily usage">
           ⏳ <span id="usage-time-left">Unlimited</span>
         </div>
@@ -99,43 +106,48 @@
       </div>
     </div>
 
-    <!-- Input Device Selector -->
-    <section class="control-section">
-      <label class="control-label" for="device-select">
-        <span class="label-icon">🎤</span>
-        Input Microphone
-      </label>
-      <div class="select-wrapper">
-        <select id="device-select" class="device-select">
-          <option value="">Loading devices...</option>
-        </select>
-        <span class="select-arrow">▾</span>
-      </div>
-    </section>
+    <!-- Controls Row (2 Columns for balanced width) -->
+    <div class="controls-row">
+      <!-- Input Device Selector -->
+      <section class="control-section">
+        <label class="control-label" for="device-select">
+          <span class="label-icon">🎤</span>
+          Input Microphone
+        </label>
+        <div class="select-wrapper">
+          <select id="device-select" class="device-select">
+            <option value="">Loading devices...</option>
+          </select>
+          <span class="select-arrow">▾</span>
+        </div>
+      </section>
 
-    <!-- Target Voice Style -->
-    <section class="control-section">
-      <label class="control-label">
-        <span class="label-icon">👤</span>
-        Target Voice Style
-      </label>
-      <div class="style-segmented-control">
-        <button id="btn-style-male" class="segmented-btn active" data-style="male">
-          <span class="btn-icon">🧔</span> Masculine
-        </button>
-        <button id="btn-style-female" class="segmented-btn" data-style="female">
-          <span class="btn-icon">👩</span> Feminine
-        </button>
-      </div>
-    </section>
+      <!-- Target Voice Style -->
+      <section class="control-section">
+        <label class="control-label">
+          <span class="label-icon">👤</span>
+          Target Voice Style
+        </label>
+        <div class="style-segmented-control">
+          <button id="btn-style-male" class="segmented-btn active" data-style="male">
+            <span class="btn-icon">🧔</span> Masculine
+          </button>
+          <button id="btn-style-female" class="segmented-btn" data-style="female">
+            <span class="btn-icon">👩</span> Feminine
+          </button>
+        </div>
+      </section>
+    </div>
 
-    <!-- Pitch Slider -->
-    <section class="control-section">
-      <label class="control-label">
-        <span class="label-icon">🎵</span>
-        Pitch Adjustment
+    <!-- Pitch Adjustment -->
+    <section class="control-section pitch-section">
+      <div class="pitch-header">
+        <label class="control-label" style="margin-bottom: 0;">
+          <span class="label-icon">🎵</span>
+          Pitch Adjustment
+        </label>
         <span id="pitch-value-display" class="pitch-badge">-3 st</span>
-      </label>
+      </div>
 
       <div class="slider-container">
         <span class="slider-label-left" id="slider-label-left">Natural</span>
@@ -166,16 +178,21 @@
     <!-- Preview Switch -->
     <section class="control-section preview-section">
       <div class="preview-row">
-        <label class="control-label" for="preview-toggle" style="margin-bottom: 0; cursor: pointer; display: flex; align-items: center;">
-          <span class="label-icon">🎧</span>
-          Preview Voice
-        </label>
-        <label class="switch">
-          <input type="checkbox" id="preview-toggle" />
-          <span class="slider-switch"></span>
-        </label>
+        <div class="preview-text-block">
+          <label class="control-label" for="preview-toggle" style="margin-bottom: 0; cursor: pointer; display: flex; align-items: center;">
+            <span class="label-icon">🎧</span>
+            Preview Voice Live
+          </label>
+          <p class="preview-hint">Hear your morphed voice live in default speakers/headphones</p>
+        </div>
+        <div class="preview-switch-wrapper">
+          <span id="preview-status-pill" class="preview-status-pill">OFF</span>
+          <label class="switch">
+            <input type="checkbox" id="preview-toggle" />
+            <span class="slider-switch"></span>
+          </label>
+        </div>
       </div>
-      <p class="preview-hint">Hear your morphed voice live in default speakers/headphones</p>
       <p class="preview-warning">⚠️ Headphones required to avoid feedback echo</p>
     </section>
 
@@ -206,9 +223,9 @@
     </div>
 
     <!-- Footer -->
-    <footer class="app-footer" style="text-align: center;">
+    <footer class="app-footer">
       <span>Output device: <strong id="output-device-name">MicMorph</strong></span>
-      <p id="meet-select-hint" style="font-size: 10.5px; color: var(--text-muted); margin-top: 4px;">
+      <p id="meet-select-hint">
         💡 In Google Meet / Zoom, select <strong>"MicMorph"</strong> as your mic.
       </p>
     </footer>
