@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Privacy Policy — MicMorph</title>
-  <meta name="description" content="MicMorph Privacy Policy. 100% on-device local voice processing. Zero data collection.">
+  <meta name="description" content="MicMorph Privacy Policy. 100% on-device local voice processing. Zero voice recording or cloud storage. Full transparency on anonymous telemetry.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -45,7 +45,7 @@
       border-bottom: 1px solid var(--border-card);
     }
     .container {
-      max-width: 800px;
+      max-width: 820px;
       margin: 0 auto;
       padding: 0 24px;
     }
@@ -87,43 +87,53 @@
     .last-updated {
       color: var(--text-muted);
       font-size: 0.9rem;
-      margin-bottom: 40px;
+      margin-bottom: 36px;
     }
     .summary-card {
       background: var(--bg-card);
       border: 1px solid var(--border-card);
       border-left: 4px solid var(--accent);
       border-radius: 12px;
-      padding: 20px 24px;
+      padding: 22px 26px;
       margin-bottom: 40px;
     }
     .summary-card h3 {
       color: var(--accent);
       font-size: 1.1rem;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
     .summary-card p {
       color: var(--text-secondary);
-      font-size: 0.95rem;
+      font-size: 0.96rem;
+      margin-bottom: 0;
     }
     h2 {
-      font-size: 1.4rem;
+      font-size: 1.35rem;
       font-weight: 700;
-      margin: 36px 0 14px;
+      margin: 40px 0 14px;
       color: var(--text-primary);
     }
     p {
       color: var(--text-secondary);
       margin-bottom: 16px;
-      font-size: 1rem;
+      font-size: 0.98rem;
     }
-    ul {
-      margin-left: 20px;
+    ul, ol {
+      margin-left: 24px;
       margin-bottom: 20px;
       color: var(--text-secondary);
     }
     li {
-      margin-bottom: 8px;
+      margin-bottom: 10px;
+    }
+    strong {
+      color: var(--text-primary);
+    }
+    code {
+      background: rgba(255,255,255,0.06);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.88em;
     }
     footer {
       border-top: 1px solid var(--border-card);
@@ -148,45 +158,69 @@
   <main class="content">
     <div class="container">
       <h1>Privacy Policy</h1>
-      <div class="last-updated">Last Updated: August 30, 2026</div>
+      <div class="last-updated">Last Updated: September 5, 2026</div>
 
       <div class="summary-card">
-        <h3>🛡️ Plain English Summary</h3>
-        <p>MicMorph processes 100% of your audio locally on your Mac in real time. We do not record, store, transmit, or analyze your voice. Your audio never leaves your computer.</p>
+        <h3>🛡️ Plain English Privacy Commitment</h3>
+        <p>MicMorph is built from the ground up on an absolute privacy-first architecture. <strong>100% of your audio processing happens entirely locally on your device in real time.</strong> We do not record, store, transcribe, or transmit your voice or microphone data to any cloud server or third party. Your voice never leaves your computer.</p>
       </div>
 
-      <h2>1. Information We Do Not Collect</h2>
-      <p>Your privacy is the core architectural principle of MicMorph:</p>
+      <h2>1. Audio and Voice Privacy (Zero Voice Data Collection)</h2>
+      <p>Your spoken words, voice timbre, and microphone stream are treated with the highest degree of privacy:</p>
       <ul>
-        <li><strong>No Audio Streaming:</strong> Your microphone input and processed audio are never sent to external servers or cloud services.</li>
-        <li><strong>No Voice Recording:</strong> MicMorph does not save audio files or voice prints to disk.</li>
-        <li><strong>No Account Required:</strong> You can download and use MicMorph completely anonymously without creating an account or providing an email address.</li>
-        <li><strong>No Third-Party Analytics:</strong> We do not embed trackers, advertising SDKs, or third-party behavioral analytics in the app.</li>
+        <li><strong>No Cloud Audio Transmission:</strong> Your microphone input and processed audio are never transmitted over the internet or sent to external servers, cloud services, or artificial intelligence inference APIs.</li>
+        <li><strong>No Audio Recording or Disk Storage:</strong> MicMorph processes audio samples entirely in temporary volatile memory (RAM) and directly outputs them to the virtual audio device. The application does not write audio files, recordings, or voice transcripts to disk.</li>
+        <li><strong>No Voice Fingerprinting:</strong> MicMorph does not generate, analyze, or retain biometric voice prints, acoustic profiles, or speaker identification templates.</li>
       </ul>
 
-      <h2>2. Information Stored Locally on Your Mac</h2>
-      <p>MicMorph stores a minimal configuration file locally on your device in your user directory (<code>~/Library/Application Support/com.micmorph.desktop/</code>). This file contains only:</p>
+      <h2>2. Anonymous Telemetry &amp; Usage Analytics (PostHog)</h2>
+      <p>To ensure application stability, diagnose crashes, measure performance, and understand how features are utilized, we collect aggregate, non-personally identifiable telemetry data through <strong>PostHog</strong> on our website and within our desktop application.</p>
+      <p><strong>What is collected:</strong></p>
       <ul>
-        <li>Your last selected voice preset (e.g., Subtle, Medium, Deep, Deepest).</li>
-        <li>Your chosen input microphone device name.</li>
-        <li>A daily usage counter to track your daily free time limit (resets every 24 hours).</li>
+        <li><strong>Feature Interaction Events:</strong> Anonymous event notifications such as pitch presets chosen (e.g. Subtle, Medium, Deep, Deepest), active pitch value, voice mode adjustments, or sample playback on our website.</li>
+        <li><strong>Call Session Duration:</strong> The aggregate duration of an active morphing session (in seconds) to understand session length and prevent stability issues during extended calls.</li>
+        <li><strong>System Environment:</strong> Operating system version (e.g. macOS), device architecture (e.g. Apple Silicon aarch64), application version, and technical error/crash traces.</li>
       </ul>
-      <p>This data is strictly local and is never uploaded anywhere.</p>
+      <p><strong>What is NEVER collected:</strong></p>
+      <ul>
+        <li>We <strong>NEVER</strong> record, intercept, or transmit any audio, microphone data, spoken words, or transcripts.</li>
+        <li>We <strong>NEVER</strong> collect personal identifiers such as your full name, email address, physical address, phone number, or biometric data.</li>
+        <li>We <strong>NEVER</strong> sell, rent, monetize, or disclose your telemetry data to third-party advertisers or data brokers.</li>
+      </ul>
 
-      <h2>3. Third-Party Virtual Audio Driver (BlackHole)</h2>
-      <p>MicMorph utilizes BlackHole, an open-source virtual audio driver created by Existential Audio Inc., to route audio between applications on macOS. BlackHole runs locally on your Mac kernel and does not connect to the internet or collect any data.</p>
+      <h2>3. Information Stored Locally on Your Mac</h2>
+      <p>MicMorph stores a minimal, human-readable configuration file strictly on your local device (in <code>~/Library/Application Support/com.micmorph.desktop/</code>). This file contains only:</p>
+      <ul>
+        <li>Your last selected voice preset (e.g. Subtle, Medium, Deep, Deepest) and custom pitch shift values.</li>
+        <li>Your selected input microphone device ID/name.</li>
+        <li>Local session timestamps.</li>
+      </ul>
+      <p>This data is stored purely for your convenience so your preferences persist when reopening the application. It is never uploaded to any remote server.</p>
 
-      <h2>4. Changes to this Privacy Policy</h2>
-      <p>We may update our Privacy Policy from time to time. Any changes will be posted on this page with an updated revision date.</p>
+      <h2>4. Virtual Audio Driver (BlackHole)</h2>
+      <p>MicMorph routes processed audio locally via BlackHole, an open-source virtual audio driver created by Existential Audio Inc. The BlackHole kernel driver runs locally on your machine to transfer audio buffers between apps. It operates completely offline, contains no network capabilities, and does not collect or transmit any data.</p>
 
-      <h2>5. Contact Us</h2>
-      <p>If you have any questions or feedback regarding this Privacy Policy, you can reach us via our official GitHub repository: <a href="https://github.com/abhinav-kumar-singh/micmorph" style="color: var(--accent);">github.com/abhinav-kumar-singh/micmorph</a>.</p>
+      <h2>5. Website Cookies and Local Storage</h2>
+      <p>Our website uses minimal local browser storage (such as <code>localStorage</code>) solely to remember your UI preference (dark mode vs. light mode). We do not use advertising cookies, retargeting pixels, or commercial tracking networks.</p>
+
+      <h2>6. Children's Privacy</h2>
+      <p>MicMorph does not knowingly collect or solicit any personal information from children under the age of 13. If you believe that a child has provided us with personal information, please contact us so we can take appropriate measures.</p>
+
+      <h2>7. GDPR &amp; CCPA Compliance (Data Subject Rights)</h2>
+      <p>Because MicMorph operates on an anonymous, local-first model, we do not associate telemetry data with your personal identity or account. However, to the extent applicable under data protection laws (such as GDPR or CCPA), you have the right to request information about our data practices or request cessation of telemetry. You may also block outbound network traffic from the desktop app using any standard macOS firewall (such as Little Snitch or LuLu) without impacting real-time audio modulation functionality.</p>
+
+      <h2>8. Changes to this Privacy Policy</h2>
+      <p>We may update this Privacy Policy periodically to reflect enhancements in our application or changes in legal requirements. We encourage you to review this page occasionally. Updates are effective upon publication.</p>
+
+      <h2>9. Contact &amp; Questions</h2>
+      <p>If you have any questions, concerns, or requests regarding this Privacy Policy or our privacy practices, please contact us via our official repository:</p>
+      <p><a href="https://github.com/abhinav-kumar-singh/micmorph" target="_blank" rel="noopener" style="color: var(--accent); font-weight: 600;">github.com/abhinav-kumar-singh/micmorph</a></p>
     </div>
   </main>
 
   <footer>
     <div class="container">
-      © 2026 MicMorph. All rights reserved.
+      © 2026 MicMorph. All rights reserved. · <a href="terms.html" style="color: var(--text-muted); text-decoration: underline;">Terms of Service</a>
     </div>
   </footer>
 </body>
