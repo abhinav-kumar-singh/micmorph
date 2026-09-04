@@ -146,7 +146,49 @@
       color: var(--text-muted);
       font-size: 0.85rem;
     }
+    .nav-right-group {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .theme-toggle {
+      position: relative;
+      width: 48px;
+      height: 26px;
+      border-radius: 100px;
+      border: 1.5px solid var(--border-card);
+      background: var(--bg-card);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      padding: 0 3px;
+      transition: background 0.3s, border-color 0.3s;
+      flex-shrink: 0;
+    }
+    .theme-toggle:hover { border-color: rgba(249,115,22,0.4); }
+    .theme-toggle-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), #fb923c);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.62rem;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    [data-theme="light"] .theme-toggle-thumb {
+      transform: translateX(22px);
+    }
   </style>
+  <script>
+    (function() {
+      var t = localStorage.getItem("micmorph-theme");
+      if (t === "light") {
+        document.documentElement.setAttribute("data-theme", "light");
+      }
+    })();
+  </script>
 </head>
 <body>
   <nav class="nav">
@@ -155,7 +197,14 @@
         <img src="logo.png" alt="MicMorph Logo">
         MicMorph
       </a>
-      <a href="index.html" class="back-link">← Back to Home</a>
+      <div class="nav-right-group">
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme" title="Toggle theme">
+          <div class="theme-toggle-thumb">
+            <span class="theme-icon">🌙</span>
+          </div>
+        </button>
+        <a href="index.html" class="back-link">← Back to Home</a>
+      </div>
     </div>
   </nav>
 
@@ -247,5 +296,28 @@
       © 2026 MicMorph. All rights reserved. · <a href="privacy.html" style="color: var(--text-muted); text-decoration: underline;">Privacy Policy</a>
     </div>
   </footer>
+  <script>
+    const themeToggle = document.getElementById("theme-toggle");
+    const themeIcon = themeToggle.querySelector(".theme-icon");
+    const html = document.documentElement;
+
+    function syncIcon() {
+      const isLight = html.getAttribute("data-theme") === "light";
+      themeIcon.textContent = isLight ? "☀️" : "🌙";
+    }
+    syncIcon();
+
+    themeToggle.addEventListener("click", () => {
+      const isLight = html.getAttribute("data-theme") === "light";
+      const next = isLight ? "dark" : "light";
+      if (next === "dark") {
+        html.removeAttribute("data-theme");
+      } else {
+        html.setAttribute("data-theme", "light");
+      }
+      localStorage.setItem("micmorph-theme", next);
+      syncIcon();
+    });
+  </script>
 </body>
 </html>
