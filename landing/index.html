@@ -2061,8 +2061,8 @@
         overflow: hidden !important;
       }
 
-      /* Mobile Terminal Box */
-      .mac-terminal-card {
+      /* Mobile Terminal & Download Boxes */
+      .mac-terminal-card, .win-download-card {
         padding: 16px 14px !important;
         border-radius: 16px !important;
         width: 100% !important;
@@ -2399,8 +2399,64 @@
             </div>
           </div>
 
-          <div class="hero-actions" id="download" style="display: none;">
-            <!-- Filled dynamically for Windows -->
+          <!-- Windows Primary Action Container (Shown when on Windows) -->
+          <div id="win-hero-container" style="display: none;">
+            <!-- Priority 1: Direct .EXE Download Card -->
+            <div class="win-download-card" style="background: var(--bg-card); border: 1.5px solid var(--border-card); border-radius: 20px; padding: 20px 22px; box-shadow: var(--neu-raised-lg); text-align: left; margin-bottom: 12px;">
+              <div class="mac-terminal-title" style="margin-bottom: 12px; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-size: 1.15rem;">⊞</span>
+                  <strong style="font-size: 0.95rem; color: var(--text-primary);">Download for Windows</strong>
+                  <span class="mac-terminal-badge" style="background: rgba(37, 99, 235, 0.15); color: #3b82f6; border-color: rgba(59, 130, 246, 0.3);">Windows 10/11</span>
+                </div>
+                <span class="mac-terminal-sub">64-bit Direct Installer</span>
+              </div>
+
+              <a href="MicMorph_0.1.0_x64-setup.exe" download class="btn-primary" style="width: 100%; justify-content: center; padding: 14px 22px; font-size: 0.96rem; border-radius: 12px; box-shadow: 0 6px 20px var(--accent-glow); margin-bottom: 8px;">
+                <span style="font-size: 1.1rem; margin-right: 4px;">⊞</span>
+                Download Free for Windows (.exe)
+              </a>
+
+              <div class="mac-terminal-footer" style="margin-top: 6px;">
+                <span>⚡ Direct download (~1.9 MB)</span>
+                <span class="mac-terminal-green">✓ Auto Driver Setup</span>
+              </div>
+            </div>
+
+            <!-- Priority 2: 1-Click Terminal Command via PowerShell -->
+            <div class="mac-terminal-card" style="padding: 14px 18px; margin-bottom: 12px;">
+              <div class="mac-terminal-title" style="margin-bottom: 8px; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <span style="font-size: 0.95rem;">⚡</span>
+                  <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-primary);">Or 1-Click Install via PowerShell</span>
+                </div>
+                <span style="font-size: 0.7rem; color: var(--text-muted);">Terminal One-Liner</span>
+              </div>
+
+              <div class="mac-terminal-cmd" style="padding: 8px 12px; font-size: 0.8rem;">
+                <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: flex; align-items: center; gap: 6px;">
+                  <span style="color: #38bdf8; font-weight: 700; font-size: 0.85rem; user-select: none;">PS&gt;</span>
+                  <span style="user-select: all; letter-spacing: -0.01em;">irm https://micmorph.work/install.ps1 | iex</span>
+                </div>
+                <button class="mac-terminal-copy-btn" type="button" onclick="navigator.clipboard.writeText('irm https://micmorph.work/install.ps1 | iex'); this.innerHTML='✓ Copied!'; setTimeout(() => this.innerHTML='📋 Copy Command', 2500);" style="padding: 6px 12px; font-size: 0.74rem;">
+                  📋 Copy Command
+                </button>
+              </div>
+
+              <div class="mac-terminal-footer" style="margin-top: 6px; font-size: 0.72rem;">
+                <span>🚀 Paste in Windows PowerShell to auto-download &amp; launch</span>
+              </div>
+            </div>
+
+            <!-- Secondary row -->
+            <div class="hero-btn-row" style="display: flex; align-items: center; gap: 12px; margin-top: 10px; flex-wrap: wrap;">
+              <a href="#how-it-works" class="btn-secondary" style="padding: 9px 18px; font-size: 0.84rem; border-radius: 10px;">
+                See How It Works →
+              </a>
+              <a href="MicMorph_0.1.0_aarch64.dmg" download style="font-size: 0.78rem; color: var(--text-muted); text-decoration: underline;">
+                Looking for macOS (.dmg)?
+              </a>
+            </div>
           </div>
 
           <!-- Feature reassurance perks -->
@@ -3478,20 +3534,15 @@
     revealEls.forEach(el => observer.observe(el));
 
     // ── OS Detection for Download Buttons ──────────────────────────────────
-    const isWindows = /Win/i.test(navigator.userAgent || navigator.platform);
+    const urlParams = new URLSearchParams(window.location.search);
+    const forcedOS = urlParams.get('os');
+    const isWindows = forcedOS === 'win' || (forcedOS !== 'mac' && /Win/i.test(navigator.userAgent || navigator.platform));
+
     if (isWindows) {
-      const heroActions = document.querySelector('.hero-actions');
-      if (heroActions) {
-        heroActions.innerHTML = `
-          <a href="https://apps.microsoft.com/" target="_blank" class="btn-primary" style="display:inline-flex; align-items:center; gap:8px;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M0 0h11.377v11.372H0zm12.623 0H24v11.372H12.623zM0 12.623h11.377V24H0zm12.623 0H24V24H12.623z"/></svg>
-            Get from Microsoft Store
-          </a>
-          <a href="MicMorph_0.1.0_x64-setup.exe" download class="btn-secondary" style="display:inline-flex; align-items:center; gap:6px;">
-            <span>⊞</span> Download Direct (.exe)
-          </a>
-        `;
-      }
+      const macHero = document.getElementById('mac-hero-container');
+      const winHero = document.getElementById('win-hero-container');
+      if (macHero) macHero.style.display = 'none';
+      if (winHero) winHero.style.display = 'block';
 
       // Update remaining download buttons
       document.querySelectorAll('.nav-cta, .btn-plan, .cta-banner .btn-primary, .step-card .btn-primary').forEach(btn => {
@@ -3499,11 +3550,18 @@
         if (appleIcon) {
           appleIcon.outerHTML = '<span style="font-size:1.1rem; margin-right:4px; display:inline-block; vertical-align:middle;">⊞</span>';
         }
-        if (btn.textContent.includes('macOS')) {
-          btn.innerHTML = btn.innerHTML.replace('macOS', 'Windows (64-bit)');
+        if (btn.textContent.includes('macOS') || btn.textContent.includes('Mac')) {
+          btn.innerHTML = btn.innerHTML.replace('for Mac', 'for Windows').replace('macOS', 'Windows (64-bit)');
         }
         btn.setAttribute('href', 'MicMorph_0.1.0_x64-setup.exe');
       });
+
+      // Update perks text for Windows
+      const perks = document.querySelectorAll('.hero-perk-item span:last-child');
+      if (perks.length >= 3) {
+        perks[0].innerHTML = '<strong>100% Free &amp; Private</strong> — Audio processed locally, never leaves your PC';
+        perks[2].innerHTML = '<strong>System Tray App for Windows</strong> — One click to toggle in Google Meet, Zoom &amp; Discord';
+      }
 
       // Update Step 1 card in How It Works
       const step1Card = document.querySelector('.step-card:nth-child(1)');
@@ -3511,7 +3569,7 @@
         const h3 = step1Card.querySelector('h3');
         const p = step1Card.querySelector('p');
         if (h3) h3.textContent = 'Download MicMorph for Windows';
-        if (p) p.textContent = 'Grab the installer for Windows 10/11. On first launch, it guides you through activating VB-Audio Cable — the virtual audio driver that connects to your apps.';
+        if (p) p.textContent = 'Grab the installer for Windows 10/11. Run the .exe setup and choose MicMorph as your microphone in any app.';
       }
     }
 
@@ -3555,8 +3613,7 @@
 
     // ── macOS Quick Launch Guide Modal Logic ─────────────────────────────
     function openMacGuide() {
-      const isWin = /Win/i.test(navigator.userAgent || navigator.platform);
-      if (!isWin) {
+      if (!isWindows) {
         const m = document.getElementById('mac-guide-modal');
         if (m) m.style.display = 'flex';
       }
