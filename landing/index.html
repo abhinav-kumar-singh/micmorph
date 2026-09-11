@@ -2503,59 +2503,42 @@
 
           <!-- Windows Primary Action Container (Shown when on Windows) -->
           <div id="win-hero-container" style="display: none;">
-            <!-- Priority 1: Direct .EXE Download Card -->
-            <div class="win-download-card" style="background: var(--bg-card); border: 1.5px solid var(--border-card); border-radius: 20px; padding: 20px 22px; box-shadow: var(--neu-raised-lg); text-align: left; margin-bottom: 12px;">
-              <div class="mac-terminal-title" style="margin-bottom: 12px; justify-content: space-between;">
+            <div class="mac-terminal-card">
+              
+              <div class="mac-terminal-title">
                 <div style="display: flex; align-items: center; gap: 8px;">
-                  <span style="font-size: 1.15rem;">⊞</span>
-                  <strong style="font-size: 0.95rem; color: var(--text-primary);">Download for Windows</strong>
-                  <span class="mac-terminal-badge" style="background: rgba(37, 99, 235, 0.15); color: #3b82f6; border-color: rgba(59, 130, 246, 0.3);">Windows 10/11</span>
+                  <span style="font-size: 1.15rem;">⚡</span>
+                  <strong style="font-size: 0.95rem; color: var(--text-primary);">1-Click Install for Windows</strong>
+                  <span class="mac-terminal-badge">Zero Setup</span>
                 </div>
-                <span class="mac-terminal-sub">64-bit Direct Installer</span>
+                <span class="mac-terminal-sub">Windows 10/11 (64-bit)</span>
               </div>
 
-              <a href="MicMorph_0.1.0_x64-setup.exe" download class="btn-primary" style="width: 100%; justify-content: center; padding: 14px 22px; font-size: 0.96rem; border-radius: 12px; box-shadow: 0 6px 20px var(--accent-glow); margin-bottom: 8px;">
-                <span style="font-size: 1.1rem; margin-right: 4px;">⊞</span>
-                Download Free for Windows (.exe)
-              </a>
-
-              <div class="mac-terminal-footer" style="margin-top: 6px;">
-                <span>⚡ Direct download (~1.9 MB)</span>
-                <span class="mac-terminal-green">✓ Auto Driver Setup</span>
-              </div>
-            </div>
-
-            <!-- Priority 2: 1-Click Terminal Command via PowerShell -->
-            <div class="mac-terminal-card" style="padding: 14px 18px; margin-bottom: 12px;">
-              <div class="mac-terminal-title" style="margin-bottom: 8px; justify-content: space-between;">
-                <div style="display: flex; align-items: center; gap: 6px;">
-                  <span style="font-size: 0.95rem;">⚡</span>
-                  <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-primary);">Or 1-Click Install via PowerShell</span>
-                </div>
-                <span style="font-size: 0.7rem; color: var(--text-muted);">Terminal One-Liner</span>
-              </div>
-
-              <div class="mac-terminal-cmd" style="padding: 8px 12px; font-size: 0.8rem;">
-                <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: flex; align-items: center; gap: 6px;">
-                  <span style="color: #38bdf8; font-weight: 700; font-size: 0.85rem; user-select: none;">PS&gt;</span>
+              <div class="mac-terminal-cmd">
+                <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: flex; align-items: center; gap: 8px;">
+                  <span style="color: var(--accent); font-weight: 700; font-size: 0.95rem; user-select: none;">PS&gt;</span>
                   <span style="user-select: all; letter-spacing: -0.01em;">irm https://micmorph.work/install.ps1 | iex</span>
                 </div>
-                <button class="mac-terminal-copy-btn" type="button" onclick="navigator.clipboard.writeText('irm https://micmorph.work/install.ps1 | iex'); this.innerHTML='✓ Copied!'; setTimeout(() => this.innerHTML='📋 Copy Command', 2500);" style="padding: 6px 12px; font-size: 0.74rem;">
+                <button class="mac-terminal-copy-btn" type="button" onclick="navigator.clipboard.writeText('irm https://micmorph.work/install.ps1 | iex'); this.innerHTML='✓ Copied!'; setTimeout(() => this.innerHTML='📋 Copy Command', 2500);">
                   📋 Copy Command
                 </button>
               </div>
 
-              <div class="mac-terminal-footer" style="margin-top: 6px; font-size: 0.72rem;">
-                <span>🚀 Paste in Windows PowerShell to auto-download &amp; launch</span>
+              <div class="mac-terminal-footer">
+                <span>🚀 Paste in Windows PowerShell to install &amp; launch in 3s</span>
+                <span class="mac-terminal-green">✓ Auto Driver Setup</span>
               </div>
             </div>
 
-            <!-- Secondary row -->
-            <div class="hero-btn-row" style="display: flex; align-items: center; gap: 12px; margin-top: 10px; flex-wrap: wrap;">
+            <!-- Secondary options row -->
+            <div class="hero-btn-row" style="display: flex; align-items: center; gap: 12px; margin-top: 14px; flex-wrap: wrap;">
+              <a href="MicMorph_0.1.0_x64-setup.exe" download class="btn-dmg-guide">
+                <span>📦</span> Download .exe Manual Installer
+              </a>
               <a href="#how-it-works" class="btn-secondary" style="padding: 9px 18px; font-size: 0.84rem; border-radius: 10px;">
                 See How It Works →
               </a>
-              <a href="MicMorph_0.1.0_aarch64.dmg" download style="font-size: 0.78rem; color: var(--text-muted); text-decoration: underline;">
+              <a href="MicMorph_0.1.0_aarch64.dmg" download style="font-size: 0.78rem; color: var(--text-muted); text-decoration: underline; margin-left: auto;">
                 Looking for macOS (.dmg)?
               </a>
             </div>
@@ -3821,8 +3804,8 @@
       if (step1Card) {
         const h3 = step1Card.querySelector('h3');
         const p = step1Card.querySelector('p');
-        if (h3) h3.textContent = 'Download MicMorph for Windows';
-        if (p) p.textContent = 'Grab the installer for Windows 10/11. Run the .exe setup and choose MicMorph as your microphone in any app.';
+        if (h3) h3.textContent = 'Install MicMorph for Windows';
+        if (p) p.textContent = 'Run the 1-click PowerShell command or grab the .exe installer. Then choose MicMorph as your microphone in any app.';
       }
     } else {
       const macHero = document.getElementById('mac-hero-container');
@@ -3839,7 +3822,7 @@
     }
 
     // ── Track All Downloads to PostHog ────────────────────────────────────
-    document.querySelectorAll('a[download], .btn-primary, .btn-plan, .terminal-quick-install button, .win-installer-btn, .nav-cta').forEach(btn => {
+    document.querySelectorAll('a[download], .btn-primary, .btn-plan, .terminal-quick-install button, .win-installer-btn, .nav-cta, .mac-terminal-copy-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const text = btn.textContent.trim();
         const isMac = text.includes('macOS') || btn.getAttribute('href')?.includes('.dmg');
