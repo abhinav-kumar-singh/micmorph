@@ -20,21 +20,54 @@ cleanup() {
 }
 trap cleanup EXIT
 
-# 1. Automatically install virtual audio driver if not present
+# 1. Automatically install virtual audio driver & configure "MicMorph"
+AUDIO_PLIST="/Library/Preferences/Audio/com.apple.audio.SystemSettings.plist"
+DRIVER_MISSING=false
+MICMORPH_MISSING=false
+
 if [ ! -d "/Library/Audio/Plug-Ins/HAL/BlackHole2ch.driver" ]; then
+  DRIVER_MISSING=true
+fi
+
+if [ ! -f "$AUDIO_PLIST" ] || ! plutil -extract Meta_UIDList json "$AUDIO_PLIST" -o - 2>/dev/null | grep -q "MicMorphAggregateUID"; then
+  MICMORPH_MISSING=true
+fi
+
+if [ "$DRIVER_MISSING" = true ] || [ "$MICMORPH_MISSING" = true ]; then
   echo "🔌 Setting up high-performance virtual audio bridge..."
   TEMP_PKG="$TEMP_DIR/BlackHole2ch.pkg"
-  curl -fsSL -o "$TEMP_PKG" "https://micmorph.work/BlackHole2ch.pkg" 2>/dev/null || curl -fsSL -o "$TEMP_PKG" "https://existential.audio/downloads/BlackHole2ch-0.7.1.pkg"
-  if [ -f "$TEMP_PKG" ]; then
-    echo "🔑 Configuring audio driver (one-time setup)..."
-    if [ -e /dev/tty ]; then
-      sudo </dev/tty installer -pkg "$TEMP_PKG" -target / 2>/dev/null || osascript -e "do shell script \"installer -pkg '$TEMP_PKG' -target /\" with administrator privileges" 2>/dev/null || true
-    else
-      osascript -e "do shell script \"installer -pkg '$TEMP_PKG' -target /\" with administrator privileges" 2>/dev/null || true
-    fi
-    sudo killall coreaudiod 2>/dev/null || killall coreaudiod 2>/dev/null || true
-    sleep 1
+  if [ "$DRIVER_MISSING" = true ]; then
+    curl -fsSL -o "$TEMP_PKG" "https://micmorph.work/BlackHole2ch.pkg" 2>/dev/null || curl -fsSL -o "$TEMP_PKG" "https://existential.audio/downloads/BlackHole2ch-0.7.1.pkg"
   fi
+
+  SETUP_SCRIPT="$TEMP_DIR/setup_audio.sh"
+  cat << 'EOF' > "$SETUP_SCRIPT"
+#!/bin/sh
+TEMP_PKG="$1"
+if [ -f "$TEMP_PKG" ]; then
+  installer -pkg "$TEMP_PKG" -target / 2>/dev/null || true
+fi
+
+AUDIO_PLIST="/Library/Preferences/Audio/com.apple.audio.SystemSettings.plist"
+META_JSON='{"name":"MicMorph","uid":"MicMorphAggregateUID","vocal isolation type":0,"subdevices":[{"channels-in":2,"channels-out":2,"don'\''t pad":0,"drift":0,"drift algorithm":0,"drift quality":127,"latency-in":0,"latency-out":0,"name":"BlackHole 2ch","uid":"BlackHole2ch_UID"}]}'
+
+plutil -replace "MetaDevice\.MicMorphAggregateUID" -json "$META_JSON" "$AUDIO_PLIST" 2>/dev/null || plutil -insert "MetaDevice\.MicMorphAggregateUID" -json "$META_JSON" "$AUDIO_PLIST" 2>/dev/null || true
+
+if ! plutil -extract Meta_UIDList json "$AUDIO_PLIST" -o - 2>/dev/null | grep -q "MicMorphAggregateUID"; then
+  plutil -insert Meta_UIDList.0 -string "MicMorphAggregateUID" "$AUDIO_PLIST" 2>/dev/null || plutil -replace Meta_UIDList -json '["MicMorphAggregateUID"]' "$AUDIO_PLIST" 2>/dev/null || plutil -insert Meta_UIDList -json '["MicMorphAggregateUID"]' "$AUDIO_PLIST" 2>/dev/null || true
+fi
+
+killall coreaudiod 2>/dev/null || true
+EOF
+  chmod +x "$SETUP_SCRIPT"
+
+  echo "🔑 Configuring audio driver (one-time setup)..."
+  if [ -e /dev/tty ]; then
+    sudo </dev/tty "$SETUP_SCRIPT" "$TEMP_PKG" 2>/dev/null || osascript -e "do shell script \"'$SETUP_SCRIPT' '$TEMP_PKG'\" with administrator privileges" 2>/dev/null || true
+  else
+    osascript -e "do shell script \"'$SETUP_SCRIPT' '$TEMP_PKG'\" with administrator privileges" 2>/dev/null || true
+  fi
+  sleep 1
 fi
 
 echo "⬇️  Downloading latest MicMorph..."
