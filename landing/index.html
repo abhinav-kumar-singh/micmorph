@@ -579,6 +579,93 @@
       color: #4ade80;
     }
 
+    /* ── Mobile Device Notice Card ── */
+    .mobile-notice-card {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border-card);
+      border-radius: 18px;
+      padding: 16px 18px;
+      box-shadow: var(--neu-raised-md);
+      text-align: left;
+      margin: 4px 0 0;
+      transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+    }
+    .mobile-notice-badge-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    .mobile-notice-badge {
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 2.5px 8px;
+      border-radius: 99px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+    .mobile-notice-badge.desktop-badge {
+      background: rgba(99, 102, 241, 0.15);
+      color: #818cf8;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+    [data-theme="light"] .mobile-notice-badge.desktop-badge {
+      background: rgba(79, 70, 229, 0.1);
+      color: #4f46e5;
+      border-color: rgba(79, 70, 229, 0.25);
+    }
+    .mobile-notice-badge.coming-soon-badge {
+      background: rgba(245, 158, 11, 0.15);
+      color: #f59e0b;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    [data-theme="light"] .mobile-notice-badge.coming-soon-badge {
+      background: rgba(217, 119, 6, 0.1);
+      color: #d97706;
+      border-color: rgba(217, 119, 6, 0.25);
+    }
+    .mobile-notice-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+      line-height: 1.3;
+    }
+    .mobile-notice-desc {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      line-height: 1.45;
+      margin-bottom: 12px;
+    }
+    .mobile-notice-desc strong {
+      color: var(--text-primary);
+    }
+    .mobile-action-box {
+      margin-bottom: 6px;
+    }
+    .mobile-share-btn {
+      width: 100%;
+      justify-content: center;
+      padding: 12px 18px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px var(--accent-glow);
+      cursor: pointer;
+    }
+    .mobile-demo-hint {
+      text-align: center;
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+
     /* ── Secondary DMG Button ── */
     .btn-dmg-guide {
       display: inline-flex;
@@ -1273,7 +1360,10 @@
       align-items: center;
     }
     @media (max-width: 768px) {
-      .wave-compare { grid-template-columns: 1fr; }
+      .wave-compare {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
     }
     .wave-box {
       background: var(--bg-card);
@@ -1331,9 +1421,19 @@
     .wave-arrow {
       font-size: 2rem;
       color: var(--purple);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      margin: 0 auto;
+      line-height: 1;
     }
     @media (max-width: 768px) {
-      .wave-arrow { transform: rotate(90deg); }
+      .wave-arrow {
+        transform: rotate(90deg);
+        margin: 4px auto;
+      }
     }
 
     /* ════════════════════════════════════════════════════════════════════════
@@ -2050,8 +2150,8 @@
         grid-template-columns: 1fr !important;
         max-width: 100% !important;
         width: 100% !important;
-        margin: 16px auto 0 !important;
-        gap: 24px !important;
+        margin: 20px auto 0 !important;
+        gap: 48px !important;
         box-sizing: border-box !important;
       }
       .hero-col-install, .hero-col-demo {
@@ -2062,11 +2162,12 @@
       }
 
       /* Mobile Terminal & Download Boxes */
-      .mac-terminal-card, .win-download-card {
+      .mac-terminal-card, .win-download-card, .mobile-notice-card {
         padding: 16px 14px !important;
         border-radius: 16px !important;
         width: 100% !important;
         max-width: 100% !important;
+        margin-bottom: 0 !important;
         box-sizing: border-box !important;
       }
       .mac-terminal-title {
@@ -2456,6 +2557,31 @@
               <a href="MicMorph_0.1.0_aarch64.dmg" download style="font-size: 0.78rem; color: var(--text-muted); text-decoration: underline;">
                 Looking for macOS (.dmg)?
               </a>
+            </div>
+          </div>
+
+          <!-- Mobile Hero Container (Shown on iOS, iPadOS, Android) -->
+          <div id="mobile-hero-container" style="display: none;">
+            <div class="mobile-notice-card">
+              <div class="mobile-notice-badge-row">
+                <span class="mobile-notice-badge desktop-badge">💻 Mac &amp; Windows</span>
+                <span class="mobile-notice-badge coming-soon-badge">📱 Mobile Soon</span>
+              </div>
+              <h3 class="mobile-notice-title">Voice Tuning for Desktop Calls</h3>
+              <p class="mobile-notice-desc">
+                Built for <strong>Google Meet, Zoom &amp; Teams</strong> on your laptop. Open this link on your computer to install:
+              </p>
+
+              <div class="mobile-action-box">
+                <button type="button" class="btn-primary mobile-share-btn" onclick="handleMobileShare(this)">
+                  <span class="btn-icon">📋</span>
+                  <span class="btn-text">Copy Link for Your Computer</span>
+                </button>
+              </div>
+
+              <div class="mobile-demo-hint">
+                <span>👇 Or try the interactive voice demo below</span>
+              </div>
             </div>
           </div>
 
@@ -3093,6 +3219,15 @@
             <p>BlackHole is a free, open-source virtual audio driver for macOS. It creates an invisible "bridge" that lets MicMorph send your transformed voice to any app. It's a one-time install via Homebrew and requires a restart.</p>
           </div>
         </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+            Can I use MicMorph on my phone or tablet?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>MicMorph is currently designed for macOS and Windows computers where calling apps (Google Meet, Zoom, Teams, Discord) allow custom audio input devices. Dedicated mobile apps for iOS and Android are actively in development!</p>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -3533,16 +3668,134 @@
 
     revealEls.forEach(el => observer.observe(el));
 
+    // ── Mobile Device Share & Copy Handler ─────────────────────────────────
+    async function handleMobileShare(btn) {
+      const shareData = {
+        title: 'MicMorph — Voice Pitch Tuning for Google Meet & Zoom',
+        text: 'MicMorph tunes your voice pitch in real-time on desktop calls. Check it out on your Mac or Windows PC:',
+        url: 'https://micmorph.work'
+      };
+
+      if (navigator.share && /mobile|android|iphone|ipad|ipod/i.test(navigator.userAgent)) {
+        try {
+          await navigator.share(shareData);
+          if (window.posthog && typeof window.posthog.capture === 'function') {
+            window.posthog.capture('mobile_share_native', { method: 'navigator.share' });
+          }
+          return;
+        } catch (err) {
+          // Fallback to clipboard if dismissed or unsupported
+        }
+      }
+
+      // Fallback: Copy link to clipboard
+      try {
+        await navigator.clipboard.writeText('https://micmorph.work');
+        const textSpan = btn ? btn.querySelector('.btn-text') : null;
+        const iconSpan = btn ? btn.querySelector('.btn-icon') : null;
+        const origText = textSpan ? textSpan.textContent : (btn ? btn.textContent : '');
+
+        if (iconSpan) iconSpan.textContent = '✓';
+        if (textSpan) textSpan.textContent = 'Link Copied! Open on Computer';
+        else if (btn) btn.textContent = '✓ Link Copied! Open on Computer';
+
+        if (window.posthog && typeof window.posthog.capture === 'function') {
+          window.posthog.capture('mobile_link_copied', { method: 'clipboard' });
+        }
+
+        setTimeout(() => {
+          if (iconSpan) iconSpan.textContent = '📋';
+          if (textSpan) textSpan.textContent = origText;
+          else if (btn) btn.textContent = origText;
+        }, 3000);
+      } catch (e) {
+        alert('Visit micmorph.work on your Mac or Windows PC to install!');
+      }
+    }
+    window.handleMobileShare = handleMobileShare;
+
     // ── OS Detection for Download Buttons ──────────────────────────────────
     const urlParams = new URLSearchParams(window.location.search);
     const forcedOS = urlParams.get('os');
-    const isWindows = forcedOS === 'win' || (forcedOS !== 'mac' && /Win/i.test(navigator.userAgent || navigator.platform));
 
-    if (isWindows) {
+    // Detect mobile & tablet devices (iOS, Android, iPadOS)
+    const isMobileDevice = forcedOS === 'mobile' || (
+      forcedOS !== 'win' && forcedOS !== 'mac' && (
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+      )
+    );
+    const isWindows = !isMobileDevice && (forcedOS === 'win' || (forcedOS !== 'mac' && /Win/i.test(navigator.userAgent || navigator.platform)));
+
+    if (isMobileDevice) {
       const macHero = document.getElementById('mac-hero-container');
       const winHero = document.getElementById('win-hero-container');
+      const mobileHero = document.getElementById('mobile-hero-container');
+      if (macHero) macHero.style.display = 'none';
+      if (winHero) winHero.style.display = 'none';
+      if (mobileHero) mobileHero.style.display = 'block';
+
+      // Update Nav CTA to invite testing the interactive demo
+      document.querySelectorAll('.nav-cta').forEach(btn => {
+        btn.textContent = 'Try Live Demo 🎙️';
+        btn.setAttribute('href', '#live-console');
+        btn.removeAttribute('download');
+      });
+
+      // Update remaining download buttons across the page
+      document.querySelectorAll('.btn-plan, .step-card .btn-primary').forEach(btn => {
+        btn.innerHTML = '<span>💻</span> Available for Mac &amp; PC';
+        btn.removeAttribute('download');
+        btn.setAttribute('href', '#hero');
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          window.handleMobileShare(btn);
+        });
+      });
+
+      // Update Step 1 card in How It Works
+      const step1Card = document.querySelector('.step-card:nth-child(1)');
+      if (step1Card) {
+        const h3 = step1Card.querySelector('h3');
+        const p = step1Card.querySelector('p');
+        if (h3) h3.textContent = 'Open on Your Mac or Windows PC';
+        if (p) p.textContent = 'Visit micmorph.work on your computer. Download the free 1-click installer and choose MicMorph as your microphone in Zoom, Meet, or Teams.';
+      }
+
+      // Update Bottom CTA Banner
+      const ctaBanner = document.querySelector('.cta-banner');
+      if (ctaBanner) {
+        const p = ctaBanner.querySelector('p');
+        const ctaBtn = ctaBanner.querySelector('.btn-primary');
+        if (p) p.innerHTML = 'MicMorph runs locally on your Mac or Windows PC. Open <strong>micmorph.work</strong> on your computer to get started.';
+        if (ctaBtn) {
+          ctaBtn.innerHTML = '<span class="btn-icon">📋</span> <span class="btn-text">Copy Link for Your Computer</span>';
+          ctaBtn.removeAttribute('download');
+          ctaBtn.setAttribute('href', 'javascript:void(0);');
+          ctaBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.handleMobileShare(ctaBtn);
+          });
+        }
+      }
+
+      // Hide bulky desktop perks and note on mobile to keep the screen airy, clean and uncluttered
+      const heroPerks = document.querySelector('.hero-perks');
+      const heroNote = document.querySelector('.hero-note');
+      if (heroPerks) heroPerks.style.display = 'none';
+      if (heroNote) heroNote.style.display = 'none';
+    } else if (isWindows) {
+      const macHero = document.getElementById('mac-hero-container');
+      const winHero = document.getElementById('win-hero-container');
+      const mobileHero = document.getElementById('mobile-hero-container');
       if (macHero) macHero.style.display = 'none';
       if (winHero) winHero.style.display = 'block';
+      if (mobileHero) mobileHero.style.display = 'none';
+
+      const heroPerks = document.querySelector('.hero-perks');
+      const heroNote = document.querySelector('.hero-note');
+      if (heroPerks) heroPerks.style.display = '';
+      if (heroNote) heroNote.style.display = '';
 
       // Update remaining download buttons
       document.querySelectorAll('.nav-cta, .btn-plan, .cta-banner .btn-primary, .step-card .btn-primary').forEach(btn => {
@@ -3571,6 +3824,18 @@
         if (h3) h3.textContent = 'Download MicMorph for Windows';
         if (p) p.textContent = 'Grab the installer for Windows 10/11. Run the .exe setup and choose MicMorph as your microphone in any app.';
       }
+    } else {
+      const macHero = document.getElementById('mac-hero-container');
+      const winHero = document.getElementById('win-hero-container');
+      const mobileHero = document.getElementById('mobile-hero-container');
+      if (macHero) macHero.style.display = 'block';
+      if (winHero) winHero.style.display = 'none';
+      if (mobileHero) mobileHero.style.display = 'none';
+
+      const heroPerks = document.querySelector('.hero-perks');
+      const heroNote = document.querySelector('.hero-note');
+      if (heroPerks) heroPerks.style.display = '';
+      if (heroNote) heroNote.style.display = '';
     }
 
     // ── Track All Downloads to PostHog ────────────────────────────────────
