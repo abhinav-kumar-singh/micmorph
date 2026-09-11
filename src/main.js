@@ -60,8 +60,8 @@ async function trackEvent(eventName, properties = {}) {
 function updateOutputDeviceLabels() {
   const isWindows = /Win/i.test(navigator.userAgent || navigator.platform);
   if (isWindows) {
-    if (outputDeviceName) outputDeviceName.textContent = 'CABLE Output (VB-Audio)';
-    if (meetSelectHint) meetSelectHint.innerHTML = '💡 In Google Meet / Zoom, select <strong>"CABLE Output"</strong> as your mic.';
+    if (outputDeviceName) outputDeviceName.textContent = 'MicMorph';
+    if (meetSelectHint) meetSelectHint.innerHTML = '💡 In Google Meet / Zoom, select <strong>"MicMorph"</strong> as your mic.';
   } else {
     if (outputDeviceName) outputDeviceName.textContent = 'MicMorph (BlackHole)';
     if (meetSelectHint) meetSelectHint.innerHTML = '💡 In Google Meet / Zoom, select <strong>"MicMorph"</strong> (or BlackHole) as your mic.';

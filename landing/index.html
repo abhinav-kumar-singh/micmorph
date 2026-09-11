@@ -3155,7 +3155,7 @@
             <span class="faq-icon">+</span>
           </button>
           <div class="faq-answer">
-            <p>Yes! MicMorph works with Google Meet, Zoom, Slack, Discord, OBS, and any app that lets you choose a microphone input. Just select "MicMorph" (BlackHole on macOS, or CABLE Output on Windows) as your mic.</p>
+            <p>Yes! MicMorph works with Google Meet, Zoom, Slack, Discord, OBS, and any app that lets you choose a microphone input. Just select "MicMorph" as your mic.</p>
           </div>
         </div>
         <div class="faq-item">
@@ -3805,12 +3805,12 @@
         const h3 = step1Card.querySelector('h3');
         const p = step1Card.querySelector('p');
         if (h3) h3.textContent = 'Install MicMorph for Windows';
-        if (p) p.textContent = 'Run the 1-click PowerShell command or grab the .exe installer. Then choose CABLE Output as your microphone in any app.';
+        if (p) p.textContent = 'Run the 1-click PowerShell command or grab the .exe installer. Then choose MicMorph as your microphone in any app.';
       }
       const step3Card = document.querySelector('.step-card:nth-child(3)');
       if (step3Card) {
         const p = step3Card.querySelector('p');
-        if (p) p.innerHTML = 'Select <strong>"CABLE Output"</strong> (VB-Audio) as your microphone in Google Meet, Zoom, or Teams. MicMorph auto-activates and you sound different instantly.';
+        if (p) p.innerHTML = 'Select <strong>"MicMorph"</strong> as your microphone in Google Meet, Zoom, or Teams. MicMorph auto-activates and you sound different instantly.';
       }
     } else {
       const macHero = document.getElementById('mac-hero-container');
