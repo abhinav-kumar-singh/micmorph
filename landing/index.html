@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,7 +12,9 @@
   <script>
     (function() {
       var t = localStorage.getItem('micmorph-theme');
-      if (t === 'light') {
+      if (t === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      } else {
         document.documentElement.setAttribute('data-theme', 'light');
       }
     })();
@@ -2415,7 +2417,7 @@
       <div class="nav-actions">
         <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
           <div class="theme-toggle-thumb">
-            <span class="theme-icon">🌙</span>
+            <span class="theme-icon">☀️</span>
           </div>
         </button>
         <button class="nav-toggle" id="nav-toggle" aria-label="Menu">☰</button>
@@ -3289,21 +3291,20 @@
     const themeIcon = themeToggle.querySelector('.theme-icon');
     const html = document.documentElement;
 
-    // Restore saved theme
+    // Restore saved theme (default: light)
     const savedTheme = localStorage.getItem('micmorph-theme');
-    if (savedTheme) {
-      html.setAttribute('data-theme', savedTheme);
-      themeIcon.textContent = savedTheme === 'light' ? '☀️' : '🌙';
+    if (savedTheme === 'dark') {
+      html.setAttribute('data-theme', 'dark');
+      themeIcon.textContent = '🌙';
+    } else {
+      html.setAttribute('data-theme', 'light');
+      themeIcon.textContent = '☀️';
     }
 
     themeToggle.addEventListener('click', () => {
       const current = html.getAttribute('data-theme');
-      const next = current === 'light' ? 'dark' : 'light';
-      if (next === 'dark') {
-        html.removeAttribute('data-theme');
-      } else {
-        html.setAttribute('data-theme', next);
-      }
+      const next = current === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
       themeIcon.textContent = next === 'light' ? '☀️' : '🌙';
       localStorage.setItem('micmorph-theme', next);
     });

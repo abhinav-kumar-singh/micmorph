@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,7 +11,7 @@
   <link rel="icon" type="image/png" href="favicon.png">
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-    :root {
+    :root, [data-theme="dark"] {
       --bg-deep: #07070d;
       --bg-card: rgba(255,255,255,0.04);
       --border-card: rgba(255,255,255,0.08);
@@ -184,7 +184,9 @@
   <script>
     (function() {
       var t = localStorage.getItem("micmorph-theme");
-      if (t === "light") {
+      if (t === "dark") {
+        document.documentElement.setAttribute("data-theme", "dark");
+      } else {
         document.documentElement.setAttribute("data-theme", "light");
       }
     })();
@@ -200,7 +202,7 @@
       <div class="nav-right-group">
         <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme" title="Toggle theme">
           <div class="theme-toggle-thumb">
-            <span class="theme-icon">🌙</span>
+            <span class="theme-icon">☀️</span>
           </div>
         </button>
         <a href="index.html" class="back-link">← Back to Home</a>
@@ -308,13 +310,9 @@
     syncIcon();
 
     themeToggle.addEventListener("click", () => {
-      const isLight = html.getAttribute("data-theme") === "light";
+      const isLight = html.getAttribute("data-theme") !== "dark";
       const next = isLight ? "dark" : "light";
-      if (next === "dark") {
-        html.removeAttribute("data-theme");
-      } else {
-        html.setAttribute("data-theme", "light");
-      }
+      html.setAttribute("data-theme", next);
       localStorage.setItem("micmorph-theme", next);
       syncIcon();
     });
