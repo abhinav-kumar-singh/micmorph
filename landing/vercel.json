@@ -24,7 +24,7 @@
       ]
     },
     {
-      "source": "/(logo\\.png|og-image\\.(png|jpg)|favicon\\.png|.*\\.(m4a|mp3|woff2))",
+      "source": "/(.*\\.(?:png|jpg|jpeg|svg|ico|webp|m4a|mp3|woff2))",
       "headers": [
         {
           "key": "Cache-Control",
