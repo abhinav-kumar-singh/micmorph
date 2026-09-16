@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+                            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd
+                            http://www.google.com/schemas/sitemap-image/1.1
+                            http://www.google.com/schemas/sitemap-image/1.1/sitemap-image.xsd">
+  <url>
+    <loc>https://micmorph.work/</loc>
+    <lastmod>2026-09-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://micmorph.work/og-image.png</image:loc>
+      <image:title>MicMorph — Free Real-Time Voice Changer for Google Meet &amp; Zoom</image:title>
+      <image:caption>MicMorph 100% on-device real-time voice changer for macOS and Windows</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://micmorph.work/logo.png</image:loc>
+      <image:title>MicMorph Logo</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://micmorph.work/privacy.html</loc>
+    <lastmod>2026-09-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://micmorph.work/terms.html</loc>
+    <lastmod>2026-09-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+</urlset>

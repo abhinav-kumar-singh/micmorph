@@ -1,0 +1,14 @@
+# robots.txt for MicMorph (https://micmorph.work)
+# Allow complete search engine indexing of web pages, scripts, and stylesheets.
+
+User-agent: *
+Allow: /
+
+# Prevent search engines from indexing raw audio stems and large binary installers
+Disallow: /audio/
+Disallow: /*.dmg$
+Disallow: /*.exe$
+Disallow: /*.pkg$
+
+# Reference to official XML sitemap
+Sitemap: https://micmorph.work/sitemap.xml

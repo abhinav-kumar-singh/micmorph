@@ -28,3 +28,7 @@ Icon
 .env
 .env.local
 *.log
+
+# Backups & Local Assets
+*.backup
+landing/logo-orig.png
