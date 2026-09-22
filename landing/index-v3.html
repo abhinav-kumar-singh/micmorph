@@ -4082,6 +4082,108 @@
       .card-bottom-left {
         display: none !important;
       }
+
+      /* ── Mobile Layout Fixes for Live Demo Card (<= 992px) ── */
+      .card-bottom-right .mockup-body {
+        padding: 16px 16px 14px !important;
+        gap: 11px !important;
+      }
+
+      .card-bottom-right .live-ab-label {
+        font-size: 0.70rem !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        flex-wrap: wrap !important;
+        gap: 4px 6px !important;
+        white-space: normal !important;
+        line-height: 1.3 !important;
+      }
+
+      .card-bottom-right .live-ab-label span:last-child {
+        white-space: nowrap !important;
+        margin-left: auto !important;
+      }
+
+      .card-bottom-right .live-ab-switch {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 6px !important;
+        padding: 4px !important;
+      }
+
+      .card-bottom-right .live-ab-btn {
+        padding: 8px 6px !important;
+        font-size: 0.74rem !important;
+        gap: 4px !important;
+        justify-content: center !important;
+        text-align: center !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        min-width: 0 !important;
+      }
+
+      .card-bottom-right .live-ab-btn span {
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+      }
+
+      .card-bottom-right .live-presets-row {
+        display: grid !important;
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 4px !important;
+      }
+
+      .card-bottom-right .live-preset-btn {
+        padding: 6px 2px !important;
+        font-size: 0.68rem !important;
+        letter-spacing: -0.2px !important;
+        text-align: center !important;
+        min-width: 0 !important;
+      }
+
+      .card-bottom-right .mockup-title {
+        font-size: 0.78rem !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero-v3-stage {
+        padding: 95px 12px 50px !important;
+      }
+
+      .card-bottom-right .mockup-body {
+        padding: 13px 12px 12px !important;
+        gap: 10px !important;
+      }
+
+      .card-bottom-right .live-ab-btn {
+        padding: 8px 4px !important;
+        font-size: 0.70rem !important;
+        letter-spacing: -0.2px !important;
+      }
+
+      .card-bottom-right .live-quote-box {
+        padding: 7px 10px !important;
+        font-size: 0.74rem !important;
+      }
+
+      .card-bottom-right .live-pitch-section {
+        padding: 9px 11px !important;
+      }
+
+      .card-bottom-right .live-presets-row {
+        gap: 3px !important;
+      }
+
+      .card-bottom-right .live-preset-btn {
+        font-size: 0.64rem !important;
+        padding: 5px 1px !important;
+      }
     }
 
     @media (min-width: 993px) {
@@ -4175,7 +4277,7 @@
                 <span style="color: var(--accent); font-weight: 700; font-size: 0.95rem; user-select: none;">$</span>
                 <span style="user-select: all; letter-spacing: -0.01em;">curl -fsSL https://micmorph.work/install.sh | bash</span>
               </div>
-              <button class="mac-terminal-copy-btn" type="button" onclick="navigator.clipboard.writeText('curl -fsSL https://micmorph.work/install.sh | bash'); this.innerHTML='✓ Copied!'; setTimeout(() => this.innerHTML='📋 Copy Command', 2500);">
+              <button class="mac-terminal-copy-btn" type="button" onclick="copyOrShareCommand('curl -fsSL https://micmorph.work/install.sh | bash', this, 'macOS');">
                 📋 Copy Command
               </button>
             </div>
@@ -4211,7 +4313,7 @@
                 <span style="color: var(--accent); font-weight: 700; font-size: 0.95rem; user-select: none;">PS&gt;</span>
                 <span style="user-select: all; letter-spacing: -0.01em;">irm https://micmorph.work/install.ps1 | iex</span>
               </div>
-              <button class="mac-terminal-copy-btn" type="button" onclick="navigator.clipboard.writeText('irm https://micmorph.work/install.ps1 | iex'); this.innerHTML='✓ Copied!'; setTimeout(() => this.innerHTML='📋 Copy Command', 2500);">
+              <button class="mac-terminal-copy-btn" type="button" onclick="copyOrShareCommand('irm https://micmorph.work/install.ps1 | iex', this, 'Windows');">
                 📋 Copy Command
               </button>
             </div>
@@ -6246,6 +6348,46 @@
 
     revealEls.forEach(el => observer.observe(el));
 
+    // ── Command Copy & Mobile Native Share (AirDrop / WhatsApp / Messages) ──
+    async function copyOrShareCommand(cmd, btn, osName) {
+      const isMobile = /mobile|android|iphone|ipad|ipod/i.test(navigator.userAgent) || 
+                       (navigator.maxTouchPoints > 1 && /Macintosh/i.test(navigator.userAgent));
+
+      // On Mobile: Trigger Native OS Share Sheet (AirDrop to Mac, WhatsApp, Messages, etc.)
+      if (navigator.share && isMobile) {
+        try {
+          await navigator.share({
+            title: `MicMorph 1-Click Install (${osName || 'Desktop'})`,
+            text: `Run this command in Terminal to install MicMorph on ${osName || 'your computer'}:\n\n${cmd}\n\nDownload page:`,
+            url: 'https://micmorph.work/'
+          });
+          if (window.posthog && typeof window.posthog.capture === 'function') {
+            window.posthog.capture('mobile_share_command', { os: osName, method: 'navigator.share' });
+          }
+          return;
+        } catch (err) {
+          // If user dismissed share sheet (AbortError), don't trigger intrusive alert
+          if (err.name === 'AbortError') return;
+        }
+      }
+
+      // Desktop or Fallback: Direct Copy to Clipboard
+      try {
+        await navigator.clipboard.writeText(cmd);
+        const origHtml = btn ? btn.innerHTML : '📋 Copy Command';
+        if (btn) btn.innerHTML = '✓ Copied!';
+        if (window.posthog && typeof window.posthog.capture === 'function') {
+          window.posthog.capture('command_copied', { os: osName });
+        }
+        setTimeout(() => {
+          if (btn) btn.innerHTML = origHtml;
+        }, 2500);
+      } catch (err) {
+        prompt('Copy this command to install:', cmd);
+      }
+    }
+    window.copyOrShareCommand = copyOrShareCommand;
+
     // ── Mobile Device Share & Copy Handler ─────────────────────────────────
     async function handleMobileShare(btn) {
       const shareData = {
@@ -6632,7 +6774,7 @@
           </p>
           <div class="mac-terminal-cmd" style="margin: 0; padding: 8px 12px; font-size: 0.8rem;">
             <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><span style="color: var(--accent); font-weight: 700;">$</span> curl -fsSL https://micmorph.work/install.sh | bash</span>
-            <button class="mac-terminal-copy-btn" onclick="navigator.clipboard.writeText('curl -fsSL https://micmorph.work/install.sh | bash'); this.innerHTML='✓ Copied!'; setTimeout(() => this.innerHTML='📋 Copy', 2500);" style="padding: 5px 12px; font-size: 0.74rem;">
+            <button class="mac-terminal-copy-btn" onclick="copyOrShareCommand('curl -fsSL https://micmorph.work/install.sh | bash', this, 'macOS');" style="padding: 5px 12px; font-size: 0.74rem;">
               📋 Copy
             </button>
           </div>
