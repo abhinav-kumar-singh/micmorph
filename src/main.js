@@ -16,13 +16,28 @@ let morphStartTime = null;
 // ── DOM Elements (initialized in initDOM) ─────────────────────────────────────
 let screenOnboarding, screenMain, appHeader, statusBadge, statusLabel;
 let deviceSelect, pitchSlider, pitchValueDisplay, activeCard;
-let btnToggle, btnToggleLabel, btnIcon, outputDeviceName;
+let btnToggle, btnToggleLabel, outputDeviceName;
 let waveformBars, waveformBarEls = [];
 let btnCheckBlackhole, btnCopyBrew, presetBtns = [];
 let previewToggle, btnStyleMale, btnStyleFemale;
 let sliderLabelLeft, sliderLabelRight, usageTimeLeft, limitCard;
 let meetSelectHint, usageBadge, btnInstallDriver, installStatusText;
-let btnThemeToggle, themeIcon, previewStatusPill;
+let btnThemeToggle, previewStatusPill;
+
+// Copy button markup; icons come from the SVG sprite in index.html.
+const COPY_BUTTON_CONTENT = '<svg class="icon i-copy"><use href="#i-copy"/></svg><svg class="icon i-check"><use href="#i-check"/></svg><span>Copy</span>';
+
+// Shows a short "Copied" state on a copy button.
+function showCopied(btn) {
+  if (!btn) return;
+  const label = btn.querySelector('span');
+  btn.classList.add('copied');
+  if (label) label.textContent = 'Copied';
+  setTimeout(() => {
+    btn.classList.remove('copied');
+    if (label) label.textContent = 'Copy';
+  }, 2000);
+}
 
 // ── Anonymous Telemetry (PostHog) ─────────────────────────────────────────────
 async function trackEvent(eventName, properties = {}) {
@@ -61,10 +76,10 @@ function updateOutputDeviceLabels() {
   const isWindows = /Win/i.test(navigator.userAgent || navigator.platform);
   if (isWindows) {
     if (outputDeviceName) outputDeviceName.textContent = 'MicMorph';
-    if (meetSelectHint) meetSelectHint.innerHTML = '💡 In Google Meet / Zoom, select <strong>"MicMorph"</strong> as your mic.';
+    if (meetSelectHint) meetSelectHint.innerHTML = 'In Google Meet / Zoom, select <strong>"MicMorph"</strong> as your mic.';
   } else {
     if (outputDeviceName) outputDeviceName.textContent = 'MicMorph (BlackHole)';
-    if (meetSelectHint) meetSelectHint.innerHTML = '💡 In Google Meet / Zoom, select <strong>"MicMorph"</strong> (or BlackHole) as your mic.';
+    if (meetSelectHint) meetSelectHint.innerHTML = 'In Google Meet / Zoom, select <strong>"MicMorph"</strong> (or BlackHole) as your mic.';
   }
 }
 
@@ -137,7 +152,7 @@ function showScreen(name) {
       if (step1Title) step1Title.textContent = 'Install VB-Audio Virtual Cable';
       if (step1Desc) step1Desc.textContent = 'VB-Audio Virtual Cable is a free, trusted audio driver for Windows. MicMorph uses it to send your voice to Zoom, Meet, Teams, and Discord.';
       if (driverAction) {
-        driverAction.innerHTML = `<a href="https://download.vb-audio.com/Download_CABLE/VBCABLE_Driver_Pack43.zip" target="_blank" style="padding:8px 16px; font-size:0.85rem; text-decoration:none; display:inline-flex; align-items:center; gap:6px; color:var(--accent); font-weight:600; border:1px solid var(--border-card); border-radius:8px; background:var(--bg-card);">📥 Download Driver Installer (ZIP)</a>`;
+        driverAction.innerHTML = `<a class="btn-link" href="https://download.vb-audio.com/Download_CABLE/VBCABLE_Driver_Pack43.zip" target="_blank"><svg class="icon"><use href="#i-download"/></svg>Download Driver Installer (ZIP)</a>`;
       }
       if (step2Title) step2Title.textContent = 'Restart Your Device';
       if (step2Desc) step2Desc.textContent = 'After installation, restart your computer once to register the virtual audio driver.';
@@ -147,11 +162,10 @@ function showScreen(name) {
       if (step1Title) step1Title.textContent = 'Install BlackHole Virtual Mic';
       if (step1Desc) step1Desc.textContent = 'BlackHole is a free, trusted virtual audio driver. MicMorph uses it to route your processed voice to Zoom, Meet, and Slack.';
       if (driverAction) {
-        driverAction.innerHTML = `<code id="brew-command">brew install blackhole-2ch</code> <button id="btn-copy-brew" class="btn-copy" title="Copy command">📋</button>`;
+        driverAction.innerHTML = `<code id="brew-command">brew install blackhole-2ch</code> <button id="btn-copy-brew" class="btn-copy" type="button" title="Copy command">${COPY_BUTTON_CONTENT}</button>`;
         document.getElementById('btn-copy-brew')?.addEventListener('click', () => {
           navigator.clipboard.writeText('brew install blackhole-2ch').then(() => {
-            const btn = document.getElementById('btn-copy-brew');
-            if (btn) { btn.textContent = '✅'; setTimeout(() => { btn.textContent = '📋'; }, 2000); }
+            showCopied(document.getElementById('btn-copy-brew'));
           });
         });
       }
@@ -203,7 +217,9 @@ function setVoiceMode(mode) {
 
   if (!pitchSlider) return;
 
+  // Masculine values run −1 → −8, so the slider is drawn right-to-left: further right = stronger in both styles.
   if (mode === 'male') {
+    pitchSlider.dir = 'rtl';
     pitchSlider.min = '-8';
     pitchSlider.max = '-1';
     pitchSlider.value = '-3';
@@ -219,6 +235,7 @@ function setVoiceMode(mode) {
     updatePitchDisplay(-3);
     sendPitchChange(-3);
   } else {
+    pitchSlider.dir = 'ltr';
     pitchSlider.min = '1';
     pitchSlider.max = '8';
     pitchSlider.value = '4';
@@ -283,8 +300,26 @@ function onPitchSelected(semitones, triggerType, presetName = null) {
 function updatePitchDisplay(value) {
   const semitones = parseFloat(value);
   currentPitch = semitones;
-  if (pitchValueDisplay) pitchValueDisplay.textContent = `${semitones} st`;
+  if (pitchValueDisplay) pitchValueDisplay.textContent = formatSemitones(semitones);
   presetBtns.forEach(btn => btn?.classList?.toggle('active', parseFloat(btn.dataset?.semitones) === semitones));
+  updateSliderFill();
+}
+
+// "−3", "+4" or "0" for the pitch readout.
+function formatSemitones(semitones) {
+  if (semitones > 0) return `+${semitones}`;
+  if (semitones < 0) return `−${Math.abs(semitones)}`;
+  return '0';
+}
+
+// Fills the slider track from its "Natural" end up to the thumb (read by styles.css as --f).
+function updateSliderFill() {
+  if (!pitchSlider) return;
+  const min = parseFloat(pitchSlider.min);
+  const max = parseFloat(pitchSlider.max);
+  const value = Math.min(max, Math.max(min, parseFloat(pitchSlider.value)));
+  const fromLeft = pitchSlider.dir === 'rtl' ? (max - value) / (max - min) : (value - min) / (max - min);
+  pitchSlider.style.setProperty('--f', fromLeft.toFixed(3));
 }
 
 // ── Processing Control ────────────────────────────────────────────────────────
@@ -360,13 +395,12 @@ function setStatus(type, label) {
 
 function setToggleState(state) {
   if (!btnToggle || !btnToggleLabel) return;
+  // The play / stop glyph is drawn by styles.css from the btn-start / btn-stop class.
   if (state === 'stop') {
     btnToggle.className = 'btn-toggle btn-stop';
-    if (btnIcon) btnIcon.textContent = '■';
     btnToggleLabel.textContent = 'Stop MicMorph';
   } else {
     btnToggle.className = 'btn-toggle btn-start';
-    if (btnIcon) btnIcon.textContent = '▶';
     btnToggleLabel.textContent = 'Start MicMorph';
   }
 }
@@ -440,7 +474,6 @@ function initDOM() {
   activeCard        = document.getElementById('active-card');
   btnToggle         = document.getElementById('btn-toggle');
   btnToggleLabel    = document.getElementById('btn-toggle-label');
-  btnIcon           = btnToggle?.querySelector('.btn-icon');
   outputDeviceName  = document.getElementById('output-device-name');
   waveformBars      = document.getElementById('waveform-bars');
   waveformBarEls    = waveformBars ? Array.from(waveformBars.querySelectorAll('span')) : [];
@@ -459,7 +492,6 @@ function initDOM() {
   btnInstallDriver  = document.getElementById('btn-install-driver');
   installStatusText = document.getElementById('install-status-text');
   btnThemeToggle    = document.getElementById('btn-theme-toggle');
-  themeIcon         = document.getElementById('theme-icon');
   previewStatusPill = document.getElementById('preview-status-pill');
 }
 
@@ -472,9 +504,7 @@ function initTheme() {
 function applyTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme);
   localStorage.setItem('mm_theme', theme);
-  if (themeIcon) {
-    themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
-  }
+  // Sun / moon icon is switched by styles.css from data-theme.
   if (btnThemeToggle) {
     btnThemeToggle.setAttribute('title', theme === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme');
   }
@@ -492,7 +522,7 @@ function attachEventListeners() {
   btnThemeToggle?.addEventListener('click', toggleTheme);
   btnInstallDriver?.addEventListener('click', async () => {
     btnInstallDriver.disabled = true;
-    btnInstallDriver.textContent = '⏳ Configuring Audio Bridge...';
+    btnInstallDriver.textContent = 'Configuring Audio Bridge...';
     if (installStatusText) {
       const isWindows = /Win/i.test(navigator.userAgent || navigator.platform);
       installStatusText.textContent = isWindows 
@@ -516,7 +546,7 @@ function attachEventListeners() {
             await loadDevices();
           } else {
             btnInstallDriver.disabled = false;
-            btnInstallDriver.textContent = '⚡ Install Audio Bridge (1-Click)';
+            btnInstallDriver.textContent = 'Install Audio Bridge (1-Click)';
             if (installStatusText) installStatusText.textContent = 'Installed! Please restart your computer to activate.';
           }
         }
@@ -524,7 +554,7 @@ function attachEventListeners() {
     } catch (err) {
       console.error('Driver install error:', err);
       btnInstallDriver.disabled = false;
-      btnInstallDriver.textContent = '⚡ Try Again (1-Click Install)';
+      btnInstallDriver.textContent = 'Try Again (1-Click Install)';
       if (installStatusText) installStatusText.textContent = 'Installation was canceled or failed. You can also use manual setup below.';
     }
   });
@@ -556,12 +586,7 @@ function attachEventListeners() {
   });
 
   btnCopyBrew?.addEventListener('click', () => {
-    navigator.clipboard.writeText('brew install blackhole-2ch').then(() => {
-      if (btnCopyBrew) {
-        btnCopyBrew.textContent = '✅';
-        setTimeout(() => { if (btnCopyBrew) btnCopyBrew.textContent = '📋'; }, 2000);
-      }
-    });
+    navigator.clipboard.writeText('brew install blackhole-2ch').then(() => showCopied(btnCopyBrew));
   });
 
   appHeader?.addEventListener('mousedown', (e) => {
