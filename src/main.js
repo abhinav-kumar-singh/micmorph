@@ -62,7 +62,7 @@ async function trackEvent(eventName, properties = {}) {
         distinct_id: distinctId,
         properties: {
           $os: isWindows ? 'Windows' : 'macOS',
-          app_version: '0.1.0',
+          app_version: '0.2.0',
           ...properties,
         },
       }),

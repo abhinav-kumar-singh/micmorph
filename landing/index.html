@@ -60,7 +60,7 @@
         "url": "https://micmorph.work/",
         "image": "https://micmorph.work/og-image.png",
         "screenshot": "https://micmorph.work/og-image.png",
-        "softwareVersion": "0.1.0",
+        "softwareVersion": "0.2.0",
         "offers": {
           "@type": "Offer",
           "price": "0.00",
@@ -985,7 +985,7 @@
               </div>
               <p class="install-hint" id="install-hint">Paste into Terminal. Installs the app and its audio driver.</p>
               <div class="install-links">
-                <a class="link" id="direct-dl" href="MicMorph_0.1.0_aarch64.dmg" download data-os-file>
+                <a class="link" id="direct-dl" href="https://github.com/abhinav-kumar-singh/micmorph/releases/latest/download/MicMorph-macOS-AppleSilicon.dmg" data-os-file>
                   <svg class="icon"><use href="#i-download"/></svg><span data-os-file-label>Download .dmg</span>
                 </a>
                 <a class="link" id="view-script" href="install.sh" target="_blank" rel="noopener">
@@ -1437,7 +1437,7 @@
             <svg class="icon i-check"><use href="#i-check"/></svg>
             <span data-copy-text>Copy install command</span>
           </button>
-          <a class="btn btn-secondary" href="MicMorph_0.1.0_aarch64.dmg" download data-os-file>
+          <a class="btn btn-secondary" href="https://github.com/abhinav-kumar-singh/micmorph/releases/latest/download/MicMorph-macOS-AppleSilicon.dmg" data-os-file>
             <svg class="icon"><use href="#i-download"/></svg><span data-os-file-label>Download .dmg</span>
           </a>
         </div>
@@ -1501,17 +1501,18 @@
     onScroll();
 
     // ── Install ────────────────────────────────────────────────────────
+    // Installers come from the latest GitHub release (stable names uploaded by .github/workflows/build.yml).
     const INSTALL = {
       mac: {
         os: 'macOS', prompt: '$', where: 'Terminal', req: 'Apple Silicon Macs',
         cmd: 'curl -fsSL https://micmorph.work/install.sh | bash',
-        file: 'MicMorph_0.1.0_aarch64.dmg', fileLabel: 'Download .dmg', script: 'install.sh',
+        file: 'https://github.com/abhinav-kumar-singh/micmorph/releases/latest/download/MicMorph-macOS-AppleSilicon.dmg', fileLabel: 'Download .dmg', script: 'install.sh',
         why: 'MicMorph isn’t notarized by Apple yet, so a downloaded .dmg shows an “unidentified developer” warning. The script copies the app to Applications, installs the BlackHole audio driver and sets up the “MicMorph” microphone. It asks for your password once, for the driver. Prefer the .dmg? Install BlackHole first, then right-click MicMorph and choose Open.'
       },
       win: {
         os: 'Windows', prompt: 'PS>', where: 'PowerShell', req: 'Windows 10/11 · 64-bit',
         cmd: 'irm https://micmorph.work/install.ps1 | iex',
-        file: 'MicMorph_0.1.0_x64-setup.exe', fileLabel: 'Download .exe', script: 'install.ps1',
+        file: 'https://github.com/abhinav-kumar-singh/micmorph/releases/latest/download/MicMorph-Windows-x64-setup.exe', fileLabel: 'Download .exe', script: 'install.ps1',
         why: 'MicMorph isn’t code-signed for Windows yet, so SmartScreen may warn about the installer. The script installs the VB-CABLE audio driver, names it “MicMorph” and runs the setup. Windows asks for admin permission once. Prefer the .exe? Choose “More info → Run anyway” if SmartScreen appears.'
       }
     };
