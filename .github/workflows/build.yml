@@ -64,6 +64,23 @@ jobs:
           prerelease: false
           args: --target ${{ matrix.target }}
 
+      # micmorph.work and the install scripts download releases/latest/download/<stable name>,
+      # so every release also carries version-free copies of the installers.
+      - name: Publish Stable-Name Installers
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=$(node -p "require('./src-tauri/tauri.conf.json').version")
+          BUNDLE=src-tauri/target/${{ matrix.target }}/release/bundle
+          if [ "${{ matrix.platform }}" = "macos-latest" ]; then
+            cp "$BUNDLE"/dmg/*.dmg MicMorph-macOS-AppleSilicon.dmg
+            gh release upload "v$VERSION" MicMorph-macOS-AppleSilicon.dmg --clobber
+          else
+            cp "$BUNDLE"/nsis/*-setup.exe MicMorph-Windows-x64-setup.exe
+            gh release upload "v$VERSION" MicMorph-Windows-x64-setup.exe --clobber
+          fi
+
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:

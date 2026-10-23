@@ -71,7 +71,9 @@ EOF
 fi
 
 echo "⬇️  Downloading latest MicMorph..."
-curl -fsSL -o "$DMG_PATH" "https://micmorph.work/MicMorph_0.1.0_aarch64.dmg"
+# Latest GitHub release; falls back to the copy on micmorph.work if GitHub is unreachable.
+curl -fsSL -o "$DMG_PATH" "https://github.com/abhinav-kumar-singh/micmorph/releases/latest/download/MicMorph-macOS-AppleSilicon.dmg" \
+  || curl -fsSL -o "$DMG_PATH" "https://micmorph.work/MicMorph_0.1.0_aarch64.dmg"
 
 echo "📦 Mounting installer..."
 mkdir -p "$MOUNT_DIR"

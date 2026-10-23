@@ -177,13 +177,19 @@ if ($isAdmin) {
 Remove-Item -Path $tempRenameScript -Force -ErrorAction SilentlyContinue
 
 # 3. Download & launch MicMorph setup
-$tempExe = Join-Path $tempDir "MicMorph_0.1.0_x64-setup.exe"
-$url = "https://micmorph.work/MicMorph_0.1.0_x64-setup.exe"
+$tempExe = Join-Path $tempDir "MicMorph-Windows-x64-setup.exe"
+# Latest GitHub release; falls back to the copy on micmorph.work if GitHub is unreachable.
+$url = "https://github.com/abhinav-kumar-singh/micmorph/releases/latest/download/MicMorph-Windows-x64-setup.exe"
+$fallbackUrl = "https://micmorph.work/MicMorph_0.1.0_x64-setup.exe"
 
 Write-Host "⬇️  Downloading latest MicMorph installer..." -ForegroundColor Gray
 try {
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    Invoke-WebRequest -Uri $url -OutFile $tempExe -UseBasicParsing
+    try {
+        Invoke-WebRequest -Uri $url -OutFile $tempExe -UseBasicParsing
+    } catch {
+        Invoke-WebRequest -Uri $fallbackUrl -OutFile $tempExe -UseBasicParsing
+    }
 } catch {
     Write-Host "❌ Failed to download installer automatically." -ForegroundColor Red
     Write-Host "Please download directly from https://micmorph.work/" -ForegroundColor Yellow
