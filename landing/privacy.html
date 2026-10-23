@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,293 +14,375 @@
   <meta property="og:image" content="https://micmorph.work/og-image.png">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://micmorph.work/og-image.png">
+  <meta name="theme-color" content="#09090b">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <script>
+    try { var t = localStorage.getItem('mm-theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
-  <link rel="icon" type="image/png" href="favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+
   <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-    :root, [data-theme="dark"] {
-      --bg-deep: #07070d;
-      --bg-card: rgba(255,255,255,0.04);
-      --border-card: rgba(255,255,255,0.08);
+    /* ── Tokens (shared with index.html) ─────────────────────────────── */
+    :root {
+      --bg: #09090b;
+      --surface: #131316;
+      --surface-2: #1b1b1f;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.14);
+      --text: #fafafa;
+      --text-2: #a1a1aa;
+      --text-3: #85858e;
       --accent: #f97316;
-      --accent-glow: rgba(249,115,22,0.15);
-      --text-primary: #f1f5f9;
-      --text-secondary: #94a3b8;
-      --text-muted: #64748b;
-      --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --accent-text: #fb923c;
+      --success: #22c55e;
+      --shadow-seg: 0 1px 2px rgba(0, 0, 0, 0.4);
+      --font: 'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+      --mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      color-scheme: dark;
     }
+
     [data-theme="light"] {
-      --bg-deep: #fbfbfe;
-      --bg-card: rgba(0,0,0,0.02);
-      --border-card: rgba(0,0,0,0.08);
-      --accent: #ea580c;
-      --accent-glow: rgba(234,88,12,0.08);
-      --text-primary: #0f172a;
-      --text-secondary: #475569;
-      --text-muted: #94a3b8;
+      --bg: #fafaf9;
+      --surface: #ffffff;
+      --surface-2: #f1f1f2;
+      --border: rgba(0, 0, 0, 0.08);
+      --border-strong: rgba(0, 0, 0, 0.13);
+      --text: #0a0a0a;
+      --text-2: #52525b;
+      --text-3: #6b6b74;
+      --accent-text: #c2410c;
+      --shadow-seg: 0 1px 2px rgba(0, 0, 0, 0.08);
+      color-scheme: light;
     }
+
+    /* ── Base ───────────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
     body {
-      font-family: var(--font);
-      background: var(--bg-deep);
-      color: var(--text-primary);
-      line-height: 1.7;
-      padding: 0;
       margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 400 16px/1.6 var(--font);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+    .icon {
+      width: 16px; height: 16px; flex: none;
+      fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round;
+    }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+    .skip { position: absolute; left: -9999px; }
+    .skip:focus { left: 16px; top: 12px; z-index: 100; padding: 8px 12px; border-radius: 8px; background: var(--surface-2); }
+
+    /* ── Nav ────────────────────────────────────────────────────────────── */
     .nav {
-      padding: 20px 0;
-      border-bottom: 1px solid var(--border-card);
+      position: sticky; top: 0; z-index: 50;
+      background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: saturate(180%) blur(12px);
+      -webkit-backdrop-filter: saturate(180%) blur(12px);
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s;
     }
-    .container {
-      max-width: 820px;
-      margin: 0 auto;
-      padding: 0 24px;
+    .nav.scrolled { border-bottom-color: var(--border); }
+    .nav-inner { display: flex; align-items: center; gap: 16px; height: 64px; }
+    .brand { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+    .brand img { width: 28px; height: 28px; border-radius: 7px; }
+    .nav-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+    .icon-btn {
+      display: grid; place-items: center; width: 36px; height: 36px;
+      border-radius: 8px; color: var(--text-2); transition: background-color 0.15s, color 0.15s;
     }
-    .nav .container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    .icon-btn:hover { background: var(--surface-2); color: var(--text); }
+    [data-theme="dark"] .i-moon, [data-theme="light"] .i-sun { display: none; }
+    .back {
+      display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 12px;
+      border-radius: 8px; font-size: 14px; color: var(--text-2); transition: background-color 0.15s, color 0.15s;
     }
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      text-decoration: none;
-      color: var(--text-primary);
-      font-weight: 700;
-      font-size: 1.1rem;
+    .back:hover { background: var(--surface-2); color: var(--text); }
+
+    /* ── Document layout ────────────────────────────────────────────────── */
+    .legal { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 72px; align-items: start; padding-top: 64px; padding-bottom: 112px; }
+    .toc { position: sticky; top: 104px; font-size: 13px; }
+    .toc-title { margin: 0 0 12px; font-weight: 500; color: var(--text); }
+    .toc ol { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; border-left: 1px solid var(--border); }
+    .toc a {
+      display: block; margin-left: -1px; padding: 5px 0 5px 14px; line-height: 1.4;
+      border-left: 1px solid transparent; color: var(--text-3); transition: color 0.15s, border-color 0.15s;
     }
-    .brand img {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
+    .toc a:hover { color: var(--text-2); }
+    .toc a[aria-current="true"] { color: var(--text); border-left-color: var(--accent); }
+
+    .doc { max-width: 700px; }
+    .doc-switch {
+      display: inline-flex; gap: 2px; margin-bottom: 32px; padding: 3px;
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 9px;
     }
-    .back-link {
-      color: var(--accent);
-      text-decoration: none;
-      font-size: 0.9rem;
-      font-weight: 600;
+    .doc .doc-switch a {
+      display: inline-flex; text-decoration: none; align-items: center; height: 28px; padding: 0 12px;
+      border-radius: 6px; font-size: 13px; font-weight: 500; color: var(--text-2); transition: color 0.15s;
     }
-    .back-link:hover { text-decoration: underline; }
-    .content {
-      padding: 60px 0 100px;
-    }
+    .doc .doc-switch a:hover { color: var(--text); }
+    .doc .doc-switch a[aria-current="page"] { background: var(--surface); color: var(--text); box-shadow: inset 0 0 0 1px var(--border-strong), var(--shadow-seg); }
     h1 {
-      font-size: 2.5rem;
-      font-weight: 800;
-      margin-bottom: 8px;
-      letter-spacing: -0.02em;
+      margin: 0 0 12px;
+      font-size: clamp(2.25rem, 1.6rem + 2vw, 3rem);
+      font-weight: 600; line-height: 1.08; letter-spacing: -0.035em;
+      text-wrap: balance;
     }
-    .last-updated {
-      color: var(--text-muted);
-      font-size: 0.9rem;
-      margin-bottom: 36px;
+    .updated { margin: 0 0 40px; font-size: 14px; color: var(--text-3); }
+
+    .callout {
+      display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 16px; margin-bottom: 48px; padding: 24px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
     }
-    .summary-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-card);
-      border-left: 4px solid var(--accent);
-      border-radius: 12px;
-      padding: 22px 26px;
-      margin-bottom: 40px;
+    .callout-icon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; background: var(--surface-2); color: var(--text-2); }
+    .callout-icon.is-green { background: color-mix(in srgb, var(--success) 12%, transparent); color: var(--success); }
+    .callout-icon .icon { width: 20px; height: 20px; }
+    .doc .callout-title { margin: 8px 0 8px; font-size: 16px; font-weight: 600; letter-spacing: -0.01em; }
+    .doc .callout p { margin: 0; }
+
+    .doc section { scroll-margin-top: 88px; }
+    .doc section + section { margin-top: 40px; padding-top: 40px; border-top: 1px solid var(--border); }
+    .doc h2 { margin: 0 0 16px; font-size: 20px; font-weight: 600; line-height: 1.35; letter-spacing: -0.015em; text-wrap: balance; }
+    .doc .num { margin-right: 4px; color: var(--text-3); font-variant-numeric: tabular-nums; }
+    .doc p, .doc li { font-size: 16px; line-height: 1.75; color: var(--text-2); }
+    .doc p { margin: 0 0 16px; }
+    .doc ul { display: grid; gap: 10px; margin: 0 0 20px; padding: 0; list-style: none; }
+    .doc li { position: relative; padding-left: 20px; }
+    .doc li::before {
+      content: ''; position: absolute; left: 4px; top: 0.75em;
+      width: 5px; height: 5px; border-radius: 50%; background: var(--text-3);
     }
-    .summary-card h3 {
-      color: var(--accent);
-      font-size: 1.1rem;
-      margin-bottom: 8px;
+    .doc strong { font-weight: 500; color: var(--text); }
+    .doc code {
+      padding: 2px 6px; font: 400 0.875em/1.4 var(--mono); color: var(--text); overflow-wrap: anywhere;
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 5px;
     }
-    .summary-card p {
-      color: var(--text-secondary);
-      font-size: 0.96rem;
-      margin-bottom: 0;
+    .doc a {
+      color: var(--accent-text); text-decoration: underline; text-underline-offset: 3px;
+      text-decoration-color: color-mix(in srgb, var(--accent-text) 40%, transparent);
     }
-    h2 {
-      font-size: 1.35rem;
-      font-weight: 700;
-      margin: 40px 0 14px;
-      color: var(--text-primary);
+    .doc a:hover { text-decoration-color: currentColor; }
+    .doc .contact-link { display: inline-flex; align-items: center; gap: 6px; font-weight: 500; }
+    .doc .note {
+      margin: 20px 0 24px; padding: 18px 20px; font-size: 15px; line-height: 1.7; color: var(--text-2);
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px;
     }
-    p {
-      color: var(--text-secondary);
-      margin-bottom: 16px;
-      font-size: 0.98rem;
+    .doc .caps { font-size: 14px; letter-spacing: 0.01em; }
+
+    /* ── Footer ─────────────────────────────────────────────────────────── */
+    .footer { padding: 32px 0; border-top: 1px solid var(--border); font-size: 14px; color: var(--text-3); }
+    .footer-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 32px; }
+    .footer .brand { color: var(--text); }
+    .footer-links { display: flex; gap: 24px; color: var(--text-2); }
+    .footer-links a { transition: color 0.15s; }
+    .footer-links a:hover, .footer-links a[aria-current="page"] { color: var(--text); }
+    .footer p { margin: 0; }
+
+    /* ── Responsive ─────────────────────────────────────────────────────── */
+    @media (max-width: 1023px) {
+      .legal { grid-template-columns: minmax(0, 1fr); padding-top: 48px; padding-bottom: 88px; }
+      .toc { display: none; }
+      .doc { max-width: none; }
     }
-    ul, ol {
-      margin-left: 24px;
-      margin-bottom: 20px;
-      color: var(--text-secondary);
+    @media (max-width: 560px) {
+      .container { padding: 0 16px; }
+      .back span { display: none; }
+      .icon-btn, .back { height: 40px; }
+      .icon-btn { width: 40px; }
+      .callout { grid-template-columns: minmax(0, 1fr); padding: 20px; }
+      .doc .callout-title { margin-top: 0; }
+      .doc p, .doc li { font-size: 15px; }
     }
-    li {
-      margin-bottom: 10px;
-    }
-    strong {
-      color: var(--text-primary);
-    }
-    code {
-      background: rgba(255,255,255,0.06);
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 0.88em;
-    }
-    footer {
-      border-top: 1px solid var(--border-card);
-      padding: 30px 0;
-      text-align: center;
-      color: var(--text-muted);
-      font-size: 0.85rem;
-    }
-    .nav-right-group {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    .theme-toggle {
-      position: relative;
-      width: 48px;
-      height: 26px;
-      border-radius: 100px;
-      border: 1.5px solid var(--border-card);
-      background: var(--bg-card);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      padding: 0 3px;
-      transition: background 0.3s, border-color 0.3s;
-      flex-shrink: 0;
-    }
-    .theme-toggle:hover { border-color: rgba(249,115,22,0.4); }
-    .theme-toggle-thumb {
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), #fb923c);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.62rem;
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    [data-theme="light"] .theme-toggle-thumb {
-      transform: translateX(22px);
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
     }
   </style>
-  <script>
-    (function() {
-      var t = localStorage.getItem("micmorph-theme");
-      if (t === "dark") {
-        document.documentElement.setAttribute("data-theme", "dark");
-      } else {
-        document.documentElement.setAttribute("data-theme", "light");
-      }
-    })();
-  </script>
 </head>
 <body>
-  <nav class="nav">
-    <div class="container">
-      <a href="/" class="brand">
-        <img src="logo.png" width="32" height="32" alt="MicMorph Logo" loading="eager" decoding="async">
-        MicMorph
-      </a>
-      <div class="nav-right-group">
-        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme" title="Toggle theme">
-          <div class="theme-toggle-thumb">
-            <span class="theme-icon">☀️</span>
-          </div>
+  <!-- Lucide icons -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2m-7.07-17.07 1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
+    <symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></symbol>
+    <symbol id="i-arrow-up-right" viewBox="0 0 24 24"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-scale" viewBox="0 0 24 24"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></symbol>
+  </svg>
+
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/"><img src="logo.png" alt="" width="28" height="28">MicMorph</a>
+      <div class="nav-actions">
+        <button class="icon-btn" id="theme-toggle" type="button" aria-label="Toggle light and dark theme">
+          <svg class="icon i-sun"><use href="#i-sun"/></svg>
+          <svg class="icon i-moon"><use href="#i-moon"/></svg>
         </button>
-        <a href="/" class="back-link">← Back to Home</a>
+        <a class="back" href="/"><svg class="icon"><use href="#i-arrow-left"/></svg><span>Back to home</span></a>
       </div>
     </div>
-  </nav>
+  </header>
 
-  <main class="content">
-    <div class="container">
+  <main id="main" class="container legal">
+    <aside class="toc" aria-label="On this page">
+      <p class="toc-title">On this page</p>
+      <ol>
+        <li><a href="#audio">Audio and voice privacy</a></li>
+        <li><a href="#telemetry">Anonymous telemetry</a></li>
+        <li><a href="#local-data">Information stored locally</a></li>
+        <li><a href="#audio-driver">Virtual audio drivers</a></li>
+        <li><a href="#cookies">Cookies and local storage</a></li>
+        <li><a href="#children">Children’s privacy</a></li>
+        <li><a href="#data-rights">GDPR &amp; CCPA</a></li>
+        <li><a href="#changes">Changes to this policy</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ol>
+    </aside>
+
+    <article class="doc">
+      <nav class="doc-switch" aria-label="Legal documents">
+        <a href="privacy.html" aria-current="page">Privacy Policy</a>
+        <a href="terms.html">Terms of Service</a>
+      </nav>
       <h1>Privacy Policy</h1>
-      <div class="last-updated">Last Updated: September 5, 2026</div>
+      <p class="updated">Last Updated: October 23, 2026</p>
 
-      <div class="summary-card">
-        <h3>🛡️ Plain English Privacy Commitment</h3>
-        <p>MicMorph is built from the ground up on an absolute privacy-first architecture. <strong>100% of your audio processing happens entirely locally on your device in real time.</strong> We do not record, store, transcribe, or transmit your voice or microphone data to any cloud server or third party. Your voice never leaves your computer.</p>
+      <div class="callout">
+        <span class="callout-icon is-green" aria-hidden="true"><svg class="icon"><use href="#i-shield"/></svg></span>
+        <div>
+          <h2 class="callout-title">Plain English Privacy Commitment</h2>
+          <p>MicMorph is built from the ground up on an absolute privacy-first architecture. <strong>100% of your audio processing happens entirely locally on your device in real time.</strong> We do not record, store, transcribe, or transmit your voice or microphone data to any cloud server or third party. Your voice never leaves your computer.</p>
+        </div>
       </div>
 
-      <h2>1. Audio and Voice Privacy (Zero Voice Data Collection)</h2>
-      <p>Your spoken words, voice timbre, and microphone stream are treated with the highest degree of privacy:</p>
-      <ul>
-        <li><strong>No Cloud Audio Transmission:</strong> Your microphone input and processed audio are never transmitted over the internet or sent to external servers, cloud services, or artificial intelligence inference APIs.</li>
-        <li><strong>No Audio Recording or Disk Storage:</strong> MicMorph processes audio samples entirely in temporary volatile memory (RAM) and directly outputs them to the virtual audio device. The application does not write audio files, recordings, or voice transcripts to disk.</li>
-        <li><strong>No Voice Fingerprinting:</strong> MicMorph does not generate, analyze, or retain biometric voice prints, acoustic profiles, or speaker identification templates.</li>
-      </ul>
+      <section id="audio">
+        <h2><span class="num">1.</span> Audio and Voice Privacy (Zero Voice Data Collection)</h2>
+        <p>Your spoken words, voice timbre, and microphone stream are treated with the highest degree of privacy:</p>
+        <ul>
+          <li><strong>No Cloud Audio Transmission:</strong> Your microphone input and processed audio are never transmitted over the internet or sent to external servers, cloud services, or artificial intelligence inference APIs.</li>
+          <li><strong>No Audio Recording or Disk Storage:</strong> MicMorph processes audio samples entirely in temporary volatile memory (RAM) and directly outputs them to the virtual audio device. The application does not write audio files, recordings, or voice transcripts to disk.</li>
+          <li><strong>No Voice Fingerprinting:</strong> MicMorph does not generate, analyze, or retain biometric voice prints, acoustic profiles, or speaker identification templates.</li>
+        </ul>
+      </section>
 
-      <h2>2. Anonymous Telemetry &amp; Usage Analytics (PostHog)</h2>
-      <p>To ensure application stability, diagnose crashes, measure performance, and understand how features are utilized, we collect aggregate, non-personally identifiable telemetry data through <strong>PostHog</strong> on our website and within our desktop application.</p>
-      <p><strong>What is collected:</strong></p>
-      <ul>
-        <li><strong>Feature Interaction Events:</strong> Anonymous event notifications such as pitch presets chosen (e.g. Subtle, Medium, Deep, Deepest), active pitch value, voice mode adjustments, or sample playback on our website.</li>
-        <li><strong>Call Session Duration:</strong> The aggregate duration of an active morphing session (in seconds) to understand session length and prevent stability issues during extended calls.</li>
-        <li><strong>System Environment:</strong> Operating system version (e.g. macOS), device architecture (e.g. Apple Silicon aarch64), application version, and technical error/crash traces.</li>
-      </ul>
-      <p><strong>What is NEVER collected:</strong></p>
-      <ul>
-        <li>We <strong>NEVER</strong> record, intercept, or transmit any audio, microphone data, spoken words, or transcripts.</li>
-        <li>We <strong>NEVER</strong> collect personal identifiers such as your full name, email address, physical address, phone number, or biometric data.</li>
-        <li>We <strong>NEVER</strong> sell, rent, monetize, or disclose your telemetry data to third-party advertisers or data brokers.</li>
-      </ul>
+      <section id="telemetry">
+        <h2><span class="num">2.</span> Anonymous Telemetry &amp; Usage Analytics (PostHog)</h2>
+        <p>To ensure application stability, diagnose errors, measure performance, and understand how features are utilized, we collect usage data through <strong>PostHog</strong> (PostHog, Inc.) on our website and within our desktop application. PostHog processes this data on servers in the United States. We do not ask for your name or email address, and we do not link this data to an account.</p>
+        <p><strong>What the desktop app collects:</strong></p>
+        <ul>
+          <li><strong>Feature Interaction Events:</strong> When the app is opened, the pitch presets and values you choose (e.g. Subtle, Medium, Deep, Deepest), voice style (masculine or feminine), whether live preview is on, and theme changes.</li>
+          <li><strong>Call Session Duration:</strong> The duration of each active morphing session (in seconds) to understand session length and prevent stability issues during extended calls.</li>
+          <li><strong>Selected Microphone Name:</strong> The name of the input device you select (for example, “MacBook Pro Microphone”). If you have renamed a device, this name may include the name you gave it.</li>
+          <li><strong>System Environment:</strong> Your operating system (macOS or Windows) and the application version.</li>
+          <li><strong>Anonymous ID:</strong> A random identifier created when the app first runs and stored on your device, so that events from the same installation can be grouped together.</li>
+        </ul>
+        <p><strong>What our website collects:</strong></p>
+        <ul>
+          <li><strong>Page and Interaction Events:</strong> Pages viewed, clicks (including download and install-command buttons), and use of the voice demo, such as samples played and presets chosen.</li>
+          <li><strong>Session Recordings:</strong> Recordings of how you navigate the website, such as mouse movement, clicks, and scrolling, used to improve the website. They do not include audio.</li>
+          <li><strong>Technical Information:</strong> Browser, device type, operating system, screen size, referring page, approximate location derived from your IP address, and errors that occur on the page.</li>
+        </ul>
+        <p><strong>What is NEVER collected:</strong></p>
+        <ul>
+          <li>We <strong>NEVER</strong> record, intercept, or transmit any audio, microphone data, spoken words, or transcripts.</li>
+          <li>We <strong>NEVER</strong> collect personal identifiers such as your full name, email address, physical address, phone number, or biometric data.</li>
+          <li>We <strong>NEVER</strong> sell, rent, monetize, or disclose your telemetry data to third-party advertisers or data brokers.</li>
+        </ul>
+      </section>
 
-      <h2>3. Information Stored Locally on Your Mac</h2>
-      <p>MicMorph stores a minimal, human-readable configuration file strictly on your local device (in <code>~/Library/Application Support/com.micmorph.desktop/</code>). This file contains only:</p>
-      <ul>
-        <li>Your last selected voice preset (e.g. Subtle, Medium, Deep, Deepest) and custom pitch shift values.</li>
-        <li>Your selected input microphone device ID/name.</li>
-        <li>Local session timestamps.</li>
-      </ul>
-      <p>This data is stored purely for your convenience so your preferences persist when reopening the application. It is never uploaded to any remote server.</p>
+      <section id="local-data">
+        <h2><span class="num">3.</span> Information Stored Locally on Your Computer</h2>
+        <p>MicMorph stores a small amount of information strictly on your local device:</p>
+        <ul>
+          <li><strong>Usage File:</strong> A human-readable file (<code>usage_config.json</code>) in <code>~/Library/Application Support/com.micmorph.desktop/</code> on macOS, or <code>%APPDATA%\com.micmorph.desktop\</code> on Windows. It contains only the date you last used MicMorph, how long you have used it that day, and your plan status.</li>
+          <li><strong>App Preferences:</strong> Your light or dark theme preference and the anonymous ID described in section 2, kept in the application’s own local storage.</li>
+        </ul>
+        <p>This information is stored so the application works as expected. Apart from the anonymous ID, which is sent with usage events, none of it is uploaded to any remote server.</p>
+      </section>
 
-      <h2>4. Virtual Audio Driver (BlackHole)</h2>
-      <p>MicMorph routes processed audio locally via BlackHole, an open-source virtual audio driver created by Existential Audio Inc. The BlackHole kernel driver runs locally on your machine to transfer audio buffers between apps. It operates completely offline, contains no network capabilities, and does not collect or transmit any data.</p>
+      <section id="audio-driver">
+        <h2><span class="num">4.</span> Virtual Audio Drivers (BlackHole and VB-CABLE)</h2>
+        <p>MicMorph routes processed audio locally through a virtual audio driver: <strong>BlackHole</strong>, an open-source Core Audio driver created by Existential Audio Inc., on macOS, and <strong>VB-CABLE</strong>, created by VB-Audio Software, on Windows. These drivers run locally on your computer and only pass audio between apps. MicMorph does not use them to collect or transmit any data.</p>
+      </section>
 
-      <h2>5. Website Cookies and Local Storage</h2>
-      <p>Our website uses minimal local browser storage (such as <code>localStorage</code>) solely to remember your UI preference (dark mode vs. light mode). We do not use advertising cookies, retargeting pixels, or commercial tracking networks.</p>
+      <section id="cookies">
+        <h2><span class="num">5.</span> Website Cookies and Local Storage</h2>
+        <p>Our website uses local browser storage (such as <code>localStorage</code>) to remember your UI preference (dark mode vs. light mode). Our analytics provider, PostHog, also sets a first-party cookie and local storage entries to recognize returning visitors and group page views into sessions, as described in section 2. We do not use advertising cookies, retargeting pixels, or advertising networks. You can clear or block these cookies in your browser settings, and the website will continue to work.</p>
+      </section>
 
-      <h2>6. Children's Privacy</h2>
-      <p>MicMorph does not knowingly collect or solicit any personal information from children under the age of 13. If you believe that a child has provided us with personal information, please contact us so we can take appropriate measures.</p>
+      <section id="children">
+        <h2><span class="num">6.</span> Children's Privacy</h2>
+        <p>MicMorph does not knowingly collect or solicit any personal information from children under the age of 13. If you believe that a child has provided us with personal information, please contact us so we can take appropriate measures.</p>
+      </section>
 
-      <h2>7. GDPR &amp; CCPA Compliance (Data Subject Rights)</h2>
-      <p>Because MicMorph operates on an anonymous, local-first model, we do not associate telemetry data with your personal identity or account. However, to the extent applicable under data protection laws (such as GDPR or CCPA), you have the right to request information about our data practices or request cessation of telemetry. You may also block outbound network traffic from the desktop app using any standard macOS firewall (such as Little Snitch or LuLu) without impacting real-time audio modulation functionality.</p>
+      <section id="data-rights">
+        <h2><span class="num">7.</span> GDPR &amp; CCPA Compliance (Data Subject Rights)</h2>
+        <p>Because MicMorph operates on an anonymous, local-first model, we do not associate telemetry data with your personal identity or account. However, to the extent applicable under data protection laws (such as GDPR or CCPA), you have the right to request information about our data practices or request cessation of telemetry. You may also block outbound network traffic from the desktop app using a standard firewall (such as Little Snitch or LuLu on macOS, or Windows Defender Firewall on Windows) without impacting real-time audio modulation functionality.</p>
+      </section>
 
-      <h2>8. Changes to this Privacy Policy</h2>
-      <p>We may update this Privacy Policy periodically to reflect enhancements in our application or changes in legal requirements. We encourage you to review this page occasionally. Updates are effective upon publication.</p>
+      <section id="changes">
+        <h2><span class="num">8.</span> Changes to this Privacy Policy</h2>
+        <p>We may update this Privacy Policy periodically to reflect enhancements in our application or changes in legal requirements. We encourage you to review this page occasionally. Updates are effective upon publication.</p>
+      </section>
 
-      <h2>9. Contact &amp; Questions</h2>
-      <p>If you have any questions, concerns, or requests regarding this Privacy Policy or our privacy practices, please contact us via our official repository:</p>
-      <p><a href="https://github.com/abhinav-kumar-singh/micmorph" target="_blank" rel="noopener" style="color: var(--accent); font-weight: 600;">github.com/abhinav-kumar-singh/micmorph</a></p>
-    </div>
+      <section id="contact">
+        <h2><span class="num">9.</span> Contact &amp; Questions</h2>
+        <p>If you have any questions, concerns, or requests regarding this Privacy Policy or our privacy practices, please contact us via our official repository:</p>
+        <p><a class="contact-link" href="https://github.com/abhinav-kumar-singh/micmorph" target="_blank" rel="noopener">github.com/abhinav-kumar-singh/micmorph<svg class="icon"><use href="#i-arrow-up-right"/></svg></a></p>
+      </section>
+    </article>
   </main>
 
-  <footer>
-    <div class="container">
-      © 2026 MicMorph. All rights reserved. · <a href="terms.html" style="color: var(--text-muted); text-decoration: underline;">Terms of Service</a>
+  <footer class="footer">
+    <div class="container footer-inner">
+      <a class="brand" href="/"><img src="logo.png" alt="" width="28" height="28">MicMorph</a>
+      <nav class="footer-links" aria-label="Footer">
+        <a href="/">Home</a>
+        <a href="privacy.html" aria-current="page">Privacy</a>
+        <a href="terms.html">Terms</a>
+      </nav>
+      <p>© 2026 MicMorph. All rights reserved.</p>
     </div>
   </footer>
+
   <script>
-    const themeToggle = document.getElementById("theme-toggle");
-    const themeIcon = themeToggle.querySelector(".theme-icon");
-    const html = document.documentElement;
+  (() => {
+    'use strict';
+    const root = document.documentElement;
 
-    function syncIcon() {
-      const isLight = html.getAttribute("data-theme") === "light";
-      themeIcon.textContent = isLight ? "☀️" : "🌙";
-    }
-    syncIcon();
-
-    themeToggle.addEventListener("click", () => {
-      const isLight = html.getAttribute("data-theme") !== "dark";
-      const next = isLight ? "dark" : "light";
-      html.setAttribute("data-theme", next);
-      localStorage.setItem("micmorph-theme", next);
-      syncIcon();
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+      const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+      root.dataset.theme = next;
+      try { localStorage.setItem('mm-theme', next); } catch (e) {}
     });
+
+    // Nav border once scrolled, and highlight the section being read in the sidebar.
+    const nav = document.querySelector('.nav');
+    const tocLinks = Array.from(document.querySelectorAll('.toc a'));
+    const sections = tocLinks.map((a) => document.getElementById(a.hash.slice(1)));
+    let tick = 0;
+    function update() {
+      tick = 0;
+      nav.classList.toggle('scrolled', window.scrollY > 8);
+      const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+      let current = -1;
+      sections.forEach((s, i) => { if (s.getBoundingClientRect().top <= 140) current = i; });
+      if (atBottom) current = sections.length - 1;
+      tocLinks.forEach((a, i) => {
+        if (i === current) a.setAttribute('aria-current', 'true');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    window.addEventListener('scroll', () => { if (!tick) tick = requestAnimationFrame(update); }, { passive: true });
+    update();
+  })();
   </script>
 </body>
 </html>
