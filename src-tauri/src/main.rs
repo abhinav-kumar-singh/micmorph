@@ -51,15 +51,15 @@ fn main() {
             // Config loaded cleanly
 
             // ── System Tray ──────────────────────────────────────────────
-            let header = MenuItem::with_id(app, "header", "MicMorph Voice Control", false, None::<&str>)?;
+            let header = MenuItem::with_id(app, "header", "Voice Presets", false, None::<&str>)?;
             let sep1 = PredefinedMenuItem::separator(app)?;
-            let subtle = MenuItem::with_id(app, "preset_subtle", "Subtle", true, None::<&str>)?;
-            let medium = MenuItem::with_id(app, "preset_medium", "Medium", true, None::<&str>)?;
-            let deep = MenuItem::with_id(app, "preset_deep", "Deep", true, None::<&str>)?;
-            let deepest = MenuItem::with_id(app, "preset_deepest", "Deepest", true, None::<&str>)?;
-            let natural = MenuItem::with_id(app, "preset_natural", "Natural / Bypass", true, None::<&str>)?;
+            let subtle = MenuItem::with_id(app, "preset_subtle", "Subtle (−1)", true, None::<&str>)?;
+            let medium = MenuItem::with_id(app, "preset_medium", "Medium (−3)", true, None::<&str>)?;
+            let deep = MenuItem::with_id(app, "preset_deep", "Deep (−5)", true, None::<&str>)?;
+            let deepest = MenuItem::with_id(app, "preset_deepest", "Deepest (−8)", true, None::<&str>)?;
+            let natural = MenuItem::with_id(app, "preset_natural", "Natural (bypass)", true, None::<&str>)?;
             let sep2 = PredefinedMenuItem::separator(app)?;
-            let show = MenuItem::with_id(app, "show", "Open MicMorph Window", true, None::<&str>)?;
+            let show = MenuItem::with_id(app, "show", "Open MicMorph", true, None::<&str>)?;
             let sep3 = PredefinedMenuItem::separator(app)?;
             let quit = MenuItem::with_id(app, "quit", "Quit MicMorph", true, None::<&str>)?;
 
@@ -75,12 +75,21 @@ fn main() {
                 ],
             )?;
 
-            let tray_image = Image::from_bytes(include_bytes!("../icons/tray-icon.png"))
+            // macOS: monochrome template icon that the system tints to match the menu bar.
+            // Windows: the full-colour icon (template images don't apply in the tray).
+            #[cfg(target_os = "macos")]
+            let (tray_icon_bytes, tray_icon_is_template): (&[u8], bool) =
+                (include_bytes!("../icons/tray-icon-template.png"), true);
+            #[cfg(not(target_os = "macos"))]
+            let (tray_icon_bytes, tray_icon_is_template): (&[u8], bool) =
+                (include_bytes!("../icons/tray-icon.png"), false);
+
+            let tray_image = Image::from_bytes(tray_icon_bytes)
                 .expect("Failed to load tray icon");
 
             let _tray = TrayIconBuilder::with_id("main-tray")
                 .icon(tray_image)
-                .icon_as_template(false)
+                .icon_as_template(tray_icon_is_template)
                 .menu(&menu)
                 .show_menu_on_left_click(true)
                 .tooltip("MicMorph — Voice Pitch Tuning")
