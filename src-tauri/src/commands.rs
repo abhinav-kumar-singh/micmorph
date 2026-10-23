@@ -233,8 +233,16 @@ pub fn get_audio_level(state: State<AppState>) -> f32 {
 }
 
 #[tauri::command]
-pub fn set_pitch(semitones: f32, state: State<AppState>) -> Result<(), String> {
-    state.set_pitch(semitones)
+pub fn set_pitch(semitones: f32, state: State<AppState>, app: tauri::AppHandle) -> Result<(), String> {
+    state.set_pitch(semitones)?;
+    crate::tray::sync(&app, semitones.clamp(-12.0, 12.0));
+    Ok(())
+}
+
+/// The window's voice style ("male" / "female"), so tray presets send and tick matching values.
+#[tauri::command]
+pub fn set_voice_mode(mode: String, app: tauri::AppHandle) {
+    crate::tray::set_feminine(&app, mode == "female");
 }
 
 #[tauri::command]

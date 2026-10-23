@@ -215,6 +215,9 @@ function setVoiceMode(mode) {
   btnStyleMale?.classList.toggle('active', mode === 'male');
   btnStyleFemale?.classList.toggle('active', mode === 'female');
 
+  // Tray presets send (and tick) the values of the active voice style.
+  invoke('set_voice_mode', { mode }).catch((err) => console.error('Failed to sync tray voice style:', err));
+
   if (!pitchSlider) return;
 
   // Masculine values run −1 → −8, so the slider is drawn right-to-left: further right = stronger in both styles.
