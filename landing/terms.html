@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,317 +14,395 @@
   <meta property="og:image" content="https://micmorph.work/og-image.png">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://micmorph.work/og-image.png">
+  <meta name="theme-color" content="#09090b">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <script>
+    try { var t = localStorage.getItem('mm-theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
-  <link rel="icon" type="image/png" href="favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+
   <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-    :root, [data-theme="dark"] {
-      --bg-deep: #07070d;
-      --bg-card: rgba(255,255,255,0.04);
-      --border-card: rgba(255,255,255,0.08);
+    /* ── Tokens (shared with index.html) ─────────────────────────────── */
+    :root {
+      --bg: #09090b;
+      --surface: #131316;
+      --surface-2: #1b1b1f;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.14);
+      --text: #fafafa;
+      --text-2: #a1a1aa;
+      --text-3: #85858e;
       --accent: #f97316;
-      --accent-glow: rgba(249,115,22,0.15);
-      --text-primary: #f1f5f9;
-      --text-secondary: #94a3b8;
-      --text-muted: #64748b;
-      --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --accent-text: #fb923c;
+      --success: #22c55e;
+      --shadow-seg: 0 1px 2px rgba(0, 0, 0, 0.4);
+      --font: 'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+      --mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      color-scheme: dark;
     }
+
     [data-theme="light"] {
-      --bg-deep: #fbfbfe;
-      --bg-card: rgba(0,0,0,0.02);
-      --border-card: rgba(0,0,0,0.08);
-      --accent: #ea580c;
-      --accent-glow: rgba(234,88,12,0.08);
-      --text-primary: #0f172a;
-      --text-secondary: #475569;
-      --text-muted: #94a3b8;
+      --bg: #fafaf9;
+      --surface: #ffffff;
+      --surface-2: #f1f1f2;
+      --border: rgba(0, 0, 0, 0.08);
+      --border-strong: rgba(0, 0, 0, 0.13);
+      --text: #0a0a0a;
+      --text-2: #52525b;
+      --text-3: #6b6b74;
+      --accent-text: #c2410c;
+      --shadow-seg: 0 1px 2px rgba(0, 0, 0, 0.08);
+      color-scheme: light;
     }
+
+    /* ── Base ───────────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
     body {
-      font-family: var(--font);
-      background: var(--bg-deep);
-      color: var(--text-primary);
-      line-height: 1.7;
-      padding: 0;
       margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 400 16px/1.6 var(--font);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+    .icon {
+      width: 16px; height: 16px; flex: none;
+      fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round;
+    }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+    .skip { position: absolute; left: -9999px; }
+    .skip:focus { left: 16px; top: 12px; z-index: 100; padding: 8px 12px; border-radius: 8px; background: var(--surface-2); }
+
+    /* ── Nav ────────────────────────────────────────────────────────────── */
     .nav {
-      padding: 20px 0;
-      border-bottom: 1px solid var(--border-card);
+      position: sticky; top: 0; z-index: 50;
+      background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: saturate(180%) blur(12px);
+      -webkit-backdrop-filter: saturate(180%) blur(12px);
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s;
     }
-    .container {
-      max-width: 820px;
-      margin: 0 auto;
-      padding: 0 24px;
+    .nav.scrolled { border-bottom-color: var(--border); }
+    .nav-inner { display: flex; align-items: center; gap: 16px; height: 64px; }
+    .brand { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+    .brand img { width: 28px; height: 28px; border-radius: 7px; }
+    .nav-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+    .icon-btn {
+      display: grid; place-items: center; width: 36px; height: 36px;
+      border-radius: 8px; color: var(--text-2); transition: background-color 0.15s, color 0.15s;
     }
-    .nav .container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    .icon-btn:hover { background: var(--surface-2); color: var(--text); }
+    [data-theme="dark"] .i-moon, [data-theme="light"] .i-sun { display: none; }
+    .back {
+      display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 12px;
+      border-radius: 8px; font-size: 14px; color: var(--text-2); transition: background-color 0.15s, color 0.15s;
     }
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      text-decoration: none;
-      color: var(--text-primary);
-      font-weight: 700;
-      font-size: 1.1rem;
+    .back:hover { background: var(--surface-2); color: var(--text); }
+
+    /* ── Document layout ────────────────────────────────────────────────── */
+    .legal { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 72px; align-items: start; padding-top: 64px; padding-bottom: 112px; }
+    .toc { position: sticky; top: 104px; font-size: 13px; }
+    .toc-title { margin: 0 0 12px; font-weight: 500; color: var(--text); }
+    .toc ol { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; border-left: 1px solid var(--border); }
+    .toc a {
+      display: block; margin-left: -1px; padding: 5px 0 5px 14px; line-height: 1.4;
+      border-left: 1px solid transparent; color: var(--text-3); transition: color 0.15s, border-color 0.15s;
     }
-    .brand img {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
+    .toc a:hover { color: var(--text-2); }
+    .toc a[aria-current="true"] { color: var(--text); border-left-color: var(--accent); }
+
+    .doc { max-width: 700px; }
+    .doc-switch {
+      display: inline-flex; gap: 2px; margin-bottom: 32px; padding: 3px;
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 9px;
     }
-    .back-link {
-      color: var(--accent);
-      text-decoration: none;
-      font-size: 0.9rem;
-      font-weight: 600;
+    .doc .doc-switch a {
+      display: inline-flex; text-decoration: none; align-items: center; height: 28px; padding: 0 12px;
+      border-radius: 6px; font-size: 13px; font-weight: 500; color: var(--text-2); transition: color 0.15s;
     }
-    .back-link:hover { text-decoration: underline; }
-    .content {
-      padding: 60px 0 100px;
-    }
+    .doc .doc-switch a:hover { color: var(--text); }
+    .doc .doc-switch a[aria-current="page"] { background: var(--surface); color: var(--text); box-shadow: inset 0 0 0 1px var(--border-strong), var(--shadow-seg); }
     h1 {
-      font-size: 2.5rem;
-      font-weight: 800;
-      margin-bottom: 8px;
-      letter-spacing: -0.02em;
+      margin: 0 0 12px;
+      font-size: clamp(2.25rem, 1.6rem + 2vw, 3rem);
+      font-weight: 600; line-height: 1.08; letter-spacing: -0.035em;
+      text-wrap: balance;
     }
-    .last-updated {
-      color: var(--text-muted);
-      font-size: 0.9rem;
-      margin-bottom: 36px;
+    .updated { margin: 0 0 40px; font-size: 14px; color: var(--text-3); }
+
+    .callout {
+      display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 16px; margin-bottom: 48px; padding: 24px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
     }
-    .legal-alert {
-      background: var(--bg-card);
-      border: 1px solid var(--border-card);
-      border-left: 4px solid #3b82f6;
-      border-radius: 12px;
-      padding: 22px 26px;
-      margin-bottom: 36px;
+    .callout-icon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; background: var(--surface-2); color: var(--text-2); }
+    .callout-icon.is-green { background: color-mix(in srgb, var(--success) 12%, transparent); color: var(--success); }
+    .callout-icon .icon { width: 20px; height: 20px; }
+    .doc .callout-title { margin: 8px 0 8px; font-size: 16px; font-weight: 600; letter-spacing: -0.01em; }
+    .doc .callout p { margin: 0; }
+
+    .doc section { scroll-margin-top: 88px; }
+    .doc section + section { margin-top: 40px; padding-top: 40px; border-top: 1px solid var(--border); }
+    .doc h2 { margin: 0 0 16px; font-size: 20px; font-weight: 600; line-height: 1.35; letter-spacing: -0.015em; text-wrap: balance; }
+    .doc .num { margin-right: 4px; color: var(--text-3); font-variant-numeric: tabular-nums; }
+    .doc p, .doc li { font-size: 16px; line-height: 1.75; color: var(--text-2); }
+    .doc p { margin: 0 0 16px; }
+    .doc ul { display: grid; gap: 10px; margin: 0 0 20px; padding: 0; list-style: none; }
+    .doc li { position: relative; padding-left: 20px; }
+    .doc li::before {
+      content: ''; position: absolute; left: 4px; top: 0.75em;
+      width: 5px; height: 5px; border-radius: 50%; background: var(--text-3);
     }
-    .legal-alert h3 {
-      color: #60a5fa;
-      font-size: 1.05rem;
-      margin-bottom: 6px;
+    .doc strong { font-weight: 500; color: var(--text); }
+    .doc code {
+      padding: 2px 6px; font: 400 0.875em/1.4 var(--mono); color: var(--text); overflow-wrap: anywhere;
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 5px;
     }
-    .legal-alert p {
-      color: var(--text-secondary);
-      font-size: 0.96rem;
-      margin-bottom: 0;
+    .doc a {
+      color: var(--accent-text); text-decoration: underline; text-underline-offset: 3px;
+      text-decoration-color: color-mix(in srgb, var(--accent-text) 40%, transparent);
     }
-    h2 {
-      font-size: 1.35rem;
-      font-weight: 700;
-      margin: 40px 0 14px;
-      color: var(--text-primary);
+    .doc a:hover { text-decoration-color: currentColor; }
+    .doc .contact-link { display: inline-flex; align-items: center; gap: 6px; font-weight: 500; }
+    .doc .note {
+      margin: 20px 0 24px; padding: 18px 20px; font-size: 15px; line-height: 1.7; color: var(--text-2);
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px;
     }
-    p {
-      color: var(--text-secondary);
-      margin-bottom: 16px;
-      font-size: 0.98rem;
+    .doc .caps { font-size: 14px; letter-spacing: 0.01em; }
+
+    /* ── Footer ─────────────────────────────────────────────────────────── */
+    .footer { padding: 32px 0; border-top: 1px solid var(--border); font-size: 14px; color: var(--text-3); }
+    .footer-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 32px; }
+    .footer .brand { color: var(--text); }
+    .footer-links { display: flex; gap: 24px; color: var(--text-2); }
+    .footer-links a { transition: color 0.15s; }
+    .footer-links a:hover, .footer-links a[aria-current="page"] { color: var(--text); }
+    .footer p { margin: 0; }
+
+    /* ── Responsive ─────────────────────────────────────────────────────── */
+    @media (max-width: 1023px) {
+      .legal { grid-template-columns: minmax(0, 1fr); padding-top: 48px; padding-bottom: 88px; }
+      .toc { display: none; }
+      .doc { max-width: none; }
     }
-    ul, ol {
-      margin-left: 24px;
-      margin-bottom: 20px;
-      color: var(--text-secondary);
+    @media (max-width: 560px) {
+      .container { padding: 0 16px; }
+      .back span { display: none; }
+      .icon-btn, .back { height: 40px; }
+      .icon-btn { width: 40px; }
+      .callout { grid-template-columns: minmax(0, 1fr); padding: 20px; }
+      .doc .callout-title { margin-top: 0; }
+      .doc p, .doc li { font-size: 15px; }
     }
-    li {
-      margin-bottom: 10px;
-    }
-    strong {
-      color: var(--text-primary);
-    }
-    .disclaimer-box {
-      background: rgba(0,0,0,0.25);
-      border: 1px solid var(--border-card);
-      border-radius: 8px;
-      padding: 16px 20px;
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-      margin: 16px 0 24px;
-      line-height: 1.6;
-    }
-    footer {
-      border-top: 1px solid var(--border-card);
-      padding: 30px 0;
-      text-align: center;
-      color: var(--text-muted);
-      font-size: 0.85rem;
-    }
-    .nav-right-group {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    .theme-toggle {
-      position: relative;
-      width: 48px;
-      height: 26px;
-      border-radius: 100px;
-      border: 1.5px solid var(--border-card);
-      background: var(--bg-card);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      padding: 0 3px;
-      transition: background 0.3s, border-color 0.3s;
-      flex-shrink: 0;
-    }
-    .theme-toggle:hover { border-color: rgba(249,115,22,0.4); }
-    .theme-toggle-thumb {
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), #fb923c);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.62rem;
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    [data-theme="light"] .theme-toggle-thumb {
-      transform: translateX(22px);
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
     }
   </style>
-  <script>
-    (function() {
-      var t = localStorage.getItem("micmorph-theme");
-      if (t === "dark") {
-        document.documentElement.setAttribute("data-theme", "dark");
-      } else {
-        document.documentElement.setAttribute("data-theme", "light");
-      }
-    })();
-  </script>
 </head>
 <body>
-  <nav class="nav">
-    <div class="container">
-      <a href="/" class="brand">
-        <img src="logo.png" width="32" height="32" alt="MicMorph Logo" loading="eager" decoding="async">
-        MicMorph
-      </a>
-      <div class="nav-right-group">
-        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme" title="Toggle theme">
-          <div class="theme-toggle-thumb">
-            <span class="theme-icon">☀️</span>
-          </div>
+  <!-- Lucide icons -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2m-7.07-17.07 1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
+    <symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></symbol>
+    <symbol id="i-arrow-up-right" viewBox="0 0 24 24"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-scale" viewBox="0 0 24 24"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></symbol>
+  </svg>
+
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/"><img src="logo.png" alt="" width="28" height="28">MicMorph</a>
+      <div class="nav-actions">
+        <button class="icon-btn" id="theme-toggle" type="button" aria-label="Toggle light and dark theme">
+          <svg class="icon i-sun"><use href="#i-sun"/></svg>
+          <svg class="icon i-moon"><use href="#i-moon"/></svg>
         </button>
-        <a href="/" class="back-link">← Back to Home</a>
+        <a class="back" href="/"><svg class="icon"><use href="#i-arrow-left"/></svg><span>Back to home</span></a>
       </div>
     </div>
-  </nav>
+  </header>
 
-  <main class="content">
-    <div class="container">
+  <main id="main" class="container legal">
+    <aside class="toc" aria-label="On this page">
+      <p class="toc-title">On this page</p>
+      <ol>
+        <li><a href="#acceptance">Acceptance of terms</a></li>
+        <li><a href="#trademarks">Trademarks &amp; fair use</a></li>
+        <li><a href="#voice-samples">Voice samples</a></li>
+        <li><a href="#open-source">Software attributions</a></li>
+        <li><a href="#acceptable-use">Acceptable use</a></li>
+        <li><a href="#warranties">Disclaimer of warranties</a></li>
+        <li><a href="#liability">Limitation of liability</a></li>
+        <li><a href="#indemnification">Indemnification</a></li>
+        <li><a href="#governing-law">Governing law</a></li>
+        <li><a href="#changes">Changes to terms</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ol>
+    </aside>
+
+    <article class="doc">
+      <nav class="doc-switch" aria-label="Legal documents">
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="terms.html" aria-current="page">Terms of Service</a>
+      </nav>
       <h1>Terms of Service &amp; Legal Disclaimers</h1>
-      <div class="last-updated">Last Updated: September 5, 2026</div>
+      <p class="updated">Last Updated: October 23, 2026</p>
 
-      <div class="legal-alert">
-        <h3>⚖️ Important Notice Regarding Third-Party Brands &amp; Software</h3>
-        <p>MicMorph is an independent, third-party software utility. All product names, logos, registered trademarks, and service marks referenced on this website or in the application belong exclusively to their respective owners.</p>
+      <div class="callout">
+        <span class="callout-icon" aria-hidden="true"><svg class="icon"><use href="#i-scale"/></svg></span>
+        <div>
+          <h2 class="callout-title">Important Notice Regarding Third-Party Brands &amp; Software</h2>
+          <p>MicMorph is an independent, third-party software utility. All product names, logos, registered trademarks, and service marks referenced on this website or in the application belong exclusively to their respective owners.</p>
+        </div>
       </div>
 
-      <h2>1. Acceptance of Terms</h2>
-      <p>By downloading, installing, accessing, or using MicMorph ("Software"), or by visiting <a href="https://micmorph.work/" style="color: var(--accent);">micmorph.work</a> ("Website"), you agree to be bound by these Terms of Service. If you do not agree to these terms, do not install or use the Software.</p>
+      <section id="acceptance">
+        <h2><span class="num">1.</span> Acceptance of Terms</h2>
+        <p>By downloading, installing, accessing, or using MicMorph ("Software"), or by visiting <a href="https://micmorph.work/">micmorph.work</a> ("Website"), you agree to be bound by these Terms of Service. If you do not agree to these terms, do not install or use the Software.</p>
+      </section>
 
-      <h2>2. Third-Party Trademark Disclaimers &amp; Nominative Fair Use</h2>
-      <p>The names, trademarks, service marks, and logos of third-party platforms referenced on our website and in documentation are the exclusive intellectual property of their respective trademark holders:</p>
-      <ul>
-        <li><strong>Google Meet</strong> is a registered trademark of Google LLC / Alphabet Inc.</li>
-        <li><strong>Zoom</strong> is a registered trademark of Zoom Video Communications, Inc.</li>
-        <li><strong>Slack</strong> is a registered trademark of Slack Technologies, LLC / Salesforce, Inc.</li>
-        <li><strong>Microsoft Teams</strong> and <strong>Skype</strong> are registered trademarks of Microsoft Corporation.</li>
-        <li><strong>Discord</strong> is a registered trademark of Discord Inc.</li>
-        <li><strong>OBS Studio</strong> is an open-source project and registered trademark of the OBS Project.</li>
-        <li><strong>Twitch</strong> is a registered trademark of Twitch Interactive, Inc. / Amazon.com, Inc.</li>
-        <li><strong>Loom</strong> is a registered trademark of Loom, Inc. / Atlassian Corporation.</li>
-        <li><strong>QuickTime</strong>, <strong>FaceTime</strong>, <strong>macOS</strong>, and <strong>Apple</strong> are registered trademarks of Apple Inc.</li>
-        <li><strong>Audacity</strong> is a trademark of Muse Group.</li>
-        <li><strong>Riverside.fm</strong> is a trademark of Riverside.FM Inc.</li>
-        <li><strong>WhatsApp</strong> is a registered trademark of Meta Platforms, Inc.</li>
-        <li><strong>Telegram</strong> is a trademark of Telegram FZ-LLC.</li>
-      </ul>
-      <div class="disclaimer-box">
-        <strong>Nominative Fair Use Statement:</strong> MicMorph is an independent third-party tool that creates a standard virtual audio device on macOS. Third-party brand names and logos are used strictly under the doctrine of <em>nominative fair use</em> solely to communicate technical compatibility, interoperability, and integration support with standard macOS microphone selection menus. Such reference does not constitute or imply any endorsement, sponsorship, partnership, or affiliation with any of the companies listed above.
-      </div>
+      <section id="trademarks">
+        <h2><span class="num">2.</span> Third-Party Trademark Disclaimers &amp; Nominative Fair Use</h2>
+        <p>The names, trademarks, service marks, and logos of third-party platforms referenced on our website and in documentation are the exclusive intellectual property of their respective trademark holders:</p>
+        <ul>
+          <li><strong>Google Meet</strong> is a registered trademark of Google LLC / Alphabet Inc.</li>
+          <li><strong>Zoom</strong> is a registered trademark of Zoom Video Communications, Inc.</li>
+          <li><strong>Slack</strong> is a registered trademark of Slack Technologies, LLC / Salesforce, Inc.</li>
+          <li><strong>Microsoft Teams</strong> and <strong>Skype</strong> are registered trademarks of Microsoft Corporation.</li>
+          <li><strong>Discord</strong> is a registered trademark of Discord Inc.</li>
+          <li><strong>OBS Studio</strong> is an open-source project and registered trademark of the OBS Project.</li>
+          <li><strong>Twitch</strong> is a registered trademark of Twitch Interactive, Inc. / Amazon.com, Inc.</li>
+          <li><strong>Loom</strong> is a registered trademark of Loom, Inc. / Atlassian Corporation.</li>
+          <li><strong>QuickTime</strong>, <strong>FaceTime</strong>, <strong>macOS</strong>, and <strong>Apple</strong> are registered trademarks of Apple Inc.</li>
+          <li><strong>Audacity</strong> is a trademark of Muse Group.</li>
+          <li><strong>Riverside.fm</strong> is a trademark of Riverside.FM Inc.</li>
+          <li><strong>WhatsApp</strong> is a registered trademark of Meta Platforms, Inc.</li>
+          <li><strong>Telegram</strong> is a trademark of Telegram FZ-LLC.</li>
+        </ul>
+        <div class="note">
+          <strong>Nominative Fair Use Statement:</strong> MicMorph is an independent third-party tool that creates a standard virtual audio device on macOS and Windows. Third-party brand names and logos are used strictly under the doctrine of <em>nominative fair use</em> solely to communicate technical compatibility, interoperability, and integration support with standard microphone selection menus on macOS and Windows. Such reference does not constitute or imply any endorsement, sponsorship, partnership, or affiliation with any of the companies listed above.
+        </div>
+      </section>
 
-      <h2>3. Voice Demonstration &amp; Audio Samples Disclaimer</h2>
-      <p>All voice recordings, audio previews, and sound snippets hosted on this website (including the interactive voice preview player) are synthesized, pre-recorded, or simulated demonstrations. They are provided strictly for the purpose of illustrating technical pitch modulation, digital signal processing (DSP), and audio frequency adjustment capabilities.</p>
-      <ul>
-        <li>Voice samples do not represent, clone, or depict any actual individual without authorization.</li>
-        <li>Audio samples are not sold as synthetic voice identities or likenesses.</li>
-        <li>Actual results with live microphone input will vary based on your individual vocal characteristics, room acoustics, and microphone hardware.</li>
-      </ul>
+      <section id="voice-samples">
+        <h2><span class="num">3.</span> Voice Demonstration &amp; Audio Samples Disclaimer</h2>
+        <p>All voice recordings, audio previews, and sound snippets hosted on this website (including the interactive voice preview player) are synthesized, pre-recorded, or simulated demonstrations. They are provided strictly for the purpose of illustrating technical pitch modulation, digital signal processing (DSP), and audio frequency adjustment capabilities.</p>
+        <ul>
+          <li>Voice samples do not represent, clone, or depict any actual individual without authorization.</li>
+          <li>Audio samples are not sold as synthetic voice identities or likenesses.</li>
+          <li>Actual results with live microphone input will vary based on your individual vocal characteristics, room acoustics, and microphone hardware.</li>
+        </ul>
+      </section>
 
-      <h2>4. Open-Source Software Attributions &amp; Licensing</h2>
-      <p>MicMorph acknowledges and complies with the open-source software libraries and audio utilities utilized in its development and execution:</p>
-      <ul>
-        <li><strong>SoundTouch Audio Processing Library:</strong> Developed by Olli Parviainen. Licensed under the GNU Lesser General Public License v2.1 (LGPLv2.1). Used for real-time digital pitch transposition.</li>
-        <li><strong>BlackHole Virtual Audio Driver:</strong> Created and maintained by Existential Audio Inc. Licensed under the GNU General Public License v3.0 (GPLv3). MicMorph does not bundle or distribute modified BlackHole binaries; MicMorph facilitates the standard, unbundled installation of the official driver for audio routing.</li>
-        <li><strong>Tauri Desktop Framework:</strong> Licensed under the MIT License and Apache License 2.0. Copyright (c) Tauri Programme within The Commons Conservancy.</li>
-      </ul>
+      <section id="open-source">
+        <h2><span class="num">4.</span> Open-Source &amp; Third-Party Software Attributions</h2>
+        <p>MicMorph acknowledges and complies with the open-source and third-party software libraries and audio utilities utilized in its development and execution:</p>
+        <ul>
+          <li><strong>SoundTouch Audio Processing Library:</strong> Developed by Olli Parviainen. Licensed under the GNU Lesser General Public License v2.1 (LGPLv2.1). Used for real-time digital pitch transposition.</li>
+          <li><strong>BlackHole Virtual Audio Driver:</strong> Created and maintained by Existential Audio Inc. Licensed under the GNU General Public License v3.0 (GPLv3). MicMorph does not bundle or distribute modified BlackHole binaries; MicMorph facilitates the standard, unbundled installation of the official driver for audio routing.</li>
+          <li><strong>VB-CABLE Virtual Audio Device:</strong> Created by VB-Audio Software and used on Windows. VB-CABLE is donationware distributed under VB-Audio’s own license and is not open-source software. MicMorph does not bundle or modify VB-CABLE; the Windows install script downloads the official driver package directly from VB-Audio.</li>
+          <li><strong>Tauri Desktop Framework:</strong> Licensed under the MIT License and Apache License 2.0. Copyright (c) Tauri Programme within The Commons Conservancy.</li>
+        </ul>
+      </section>
 
-      <h2>5. Acceptable Use Policy</h2>
-      <p>You agree to use MicMorph exclusively for lawful, ethical, and authorized purposes. You explicitly agree that you shall <strong>NOT</strong> use MicMorph to:</p>
-      <ul>
-        <li>Engage in fraudulent activities, financial scams, identity theft, or deceptive impersonation.</li>
-        <li>Conduct voice phishing ("vishing"), social engineering scams, or unauthorized spoofing of individuals or institutions.</li>
-        <li>Harass, stalk, threaten, defame, or intimidate any person.</li>
-        <li>Violate any local, state, federal, or international wiretapping, eavesdropping, or audio recording consent laws (including one-party or two-party consent statutes). <em>You are solely and exclusively responsible for ensuring that all participants in any recorded or streamed communication have provided any legally required consent.</em></li>
-        <li>Interfere with emergency services, healthcare facilities, or government institutions.</li>
-      </ul>
+      <section id="acceptable-use">
+        <h2><span class="num">5.</span> Acceptable Use Policy</h2>
+        <p>You agree to use MicMorph exclusively for lawful, ethical, and authorized purposes. You explicitly agree that you shall <strong>NOT</strong> use MicMorph to:</p>
+        <ul>
+          <li>Engage in fraudulent activities, financial scams, identity theft, or deceptive impersonation.</li>
+          <li>Conduct voice phishing ("vishing"), social engineering scams, or unauthorized spoofing of individuals or institutions.</li>
+          <li>Harass, stalk, threaten, defame, or intimidate any person.</li>
+          <li>Violate any local, state, federal, or international wiretapping, eavesdropping, or audio recording consent laws (including one-party or two-party consent statutes). <em>You are solely and exclusively responsible for ensuring that all participants in any recorded or streamed communication have provided any legally required consent.</em></li>
+          <li>Interfere with emergency services, healthcare facilities, or government institutions.</li>
+        </ul>
+      </section>
 
-      <h2>6. Disclaimer of Warranties ("AS IS")</h2>
-      <p>THE SOFTWARE AND WEBSITE ARE PROVIDED ON AN "AS IS" AND "AS AVAILABLE" BASIS, WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE.</p>
-      <p>TO THE FULLEST EXTENT PERMISSIBLE UNDER APPLICABLE LAW, MICMORPH AND ITS DEVELOPERS DISCLAIM ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, ACCURACY, SYSTEM INTEGRATION, AND NON-INFRINGEMENT. WE DO NOT WARRANT THAT THE SOFTWARE WILL BE UNINTERRUPTED, BUG-FREE, COMPATIBLE WITH EVERY SYSTEM CONFIGURATION, OR CAPABLE OF ACHIEVING ANY SPECIFIC ACOUSTIC RESULT.</p>
+      <section id="warranties">
+        <h2><span class="num">6.</span> Disclaimer of Warranties ("AS IS")</h2>
+        <p class="caps">THE SOFTWARE AND WEBSITE ARE PROVIDED ON AN "AS IS" AND "AS AVAILABLE" BASIS, WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE.</p>
+        <p class="caps">TO THE FULLEST EXTENT PERMISSIBLE UNDER APPLICABLE LAW, MICMORPH AND ITS DEVELOPERS DISCLAIM ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, ACCURACY, SYSTEM INTEGRATION, AND NON-INFRINGEMENT. WE DO NOT WARRANT THAT THE SOFTWARE WILL BE UNINTERRUPTED, BUG-FREE, COMPATIBLE WITH EVERY SYSTEM CONFIGURATION, OR CAPABLE OF ACHIEVING ANY SPECIFIC ACOUSTIC RESULT.</p>
+      </section>
 
-      <h2>7. Limitation of Liability</h2>
-      <p>TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT SHALL MICMORPH, ITS CREATORS, DEVELOPERS, OR CONTRIBUTORS BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES (INCLUDING, BUT NOT LIMITED TO, LOSS OF PROFITS, LOSS OF DATA, BUSINESS INTERRUPTION, LOSS OF REPUTATION, OR HARDWARE MALFUNCTION) ARISING OUT OF OR IN CONNECTION WITH YOUR USE OR INABILITY TO USE THE SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.</p>
-      <p>IN NO EVENT SHALL MICMORPH'S TOTAL AGGREGATE LIABILITY TO YOU FOR ALL CLAIMS EXCEED THE AMOUNT ACTUALLY PAID BY YOU TO MICMORPH IN THE TWELVE (12) MONTHS PRECEDING THE CLAIM (OR $0.00 IF YOU USED THE SOFTWARE FREE OF CHARGE).</p>
+      <section id="liability">
+        <h2><span class="num">7.</span> Limitation of Liability</h2>
+        <p class="caps">TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT SHALL MICMORPH, ITS CREATORS, DEVELOPERS, OR CONTRIBUTORS BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES (INCLUDING, BUT NOT LIMITED TO, LOSS OF PROFITS, LOSS OF DATA, BUSINESS INTERRUPTION, LOSS OF REPUTATION, OR HARDWARE MALFUNCTION) ARISING OUT OF OR IN CONNECTION WITH YOUR USE OR INABILITY TO USE THE SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.</p>
+        <p class="caps">IN NO EVENT SHALL MICMORPH'S TOTAL AGGREGATE LIABILITY TO YOU FOR ALL CLAIMS EXCEED THE AMOUNT ACTUALLY PAID BY YOU TO MICMORPH IN THE TWELVE (12) MONTHS PRECEDING THE CLAIM (OR $0.00 IF YOU USED THE SOFTWARE FREE OF CHARGE).</p>
+      </section>
 
-      <h2>8. User Indemnification</h2>
-      <p>You agree to defend, indemnify, and hold harmless MicMorph, its developers, maintainers, and affiliates from and against any and all claims, liabilities, damages, judgments, awards, losses, costs, expenses, or legal fees (including reasonable attorneys' fees) resulting from or arising out of your violation of these Terms of Service, your misuse of the Software, or your violation of any law or rights of a third party.</p>
+      <section id="indemnification">
+        <h2><span class="num">8.</span> User Indemnification</h2>
+        <p>You agree to defend, indemnify, and hold harmless MicMorph, its developers, maintainers, and affiliates from and against any and all claims, liabilities, damages, judgments, awards, losses, costs, expenses, or legal fees (including reasonable attorneys' fees) resulting from or arising out of your violation of these Terms of Service, your misuse of the Software, or your violation of any law or rights of a third party.</p>
+      </section>
 
-      <h2>9. Governing Law &amp; Severability</h2>
-      <p>These Terms shall be governed by and interpreted in accordance with applicable laws, without giving effect to any principles of conflicts of law. If any provision of these Terms is held to be invalid, unlawful, or unenforceable, that provision shall be enforced to the maximum extent permissible, and the remaining provisions shall remain in full force and effect.</p>
+      <section id="governing-law">
+        <h2><span class="num">9.</span> Governing Law &amp; Severability</h2>
+        <p>These Terms shall be governed by and interpreted in accordance with applicable laws, without giving effect to any principles of conflicts of law. If any provision of these Terms is held to be invalid, unlawful, or unenforceable, that provision shall be enforced to the maximum extent permissible, and the remaining provisions shall remain in full force and effect.</p>
+      </section>
 
-      <h2>10. Modifications to Terms</h2>
-      <p>We reserve the right to revise or update these Terms of Service at any time. Material updates will be posted on this page with a revised "Last Updated" date. Your continued use of the Software following any changes constitutes your binding acceptance of the updated terms.</p>
+      <section id="changes">
+        <h2><span class="num">10.</span> Modifications to Terms</h2>
+        <p>We reserve the right to revise or update these Terms of Service at any time. Material updates will be posted on this page with a revised "Last Updated" date. Your continued use of the Software following any changes constitutes your binding acceptance of the updated terms.</p>
+      </section>
 
-      <h2>11. Contact Us</h2>
-      <p>If you have questions, inquiries, or legal correspondence concerning these Terms of Service, please contact us via our official repository:</p>
-      <p><a href="https://github.com/abhinav-kumar-singh/micmorph" target="_blank" rel="noopener" style="color: var(--accent); font-weight: 600;">github.com/abhinav-kumar-singh/micmorph</a></p>
-    </div>
+      <section id="contact">
+        <h2><span class="num">11.</span> Contact Us</h2>
+        <p>If you have questions, inquiries, or legal correspondence concerning these Terms of Service, please contact us via our official repository:</p>
+        <p><a class="contact-link" href="https://github.com/abhinav-kumar-singh/micmorph" target="_blank" rel="noopener">github.com/abhinav-kumar-singh/micmorph<svg class="icon"><use href="#i-arrow-up-right"/></svg></a></p>
+      </section>
+    </article>
   </main>
 
-  <footer>
-    <div class="container">
-      © 2026 MicMorph. All rights reserved. · <a href="privacy.html" style="color: var(--text-muted); text-decoration: underline;">Privacy Policy</a>
+  <footer class="footer">
+    <div class="container footer-inner">
+      <a class="brand" href="/"><img src="logo.png" alt="" width="28" height="28">MicMorph</a>
+      <nav class="footer-links" aria-label="Footer">
+        <a href="/">Home</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html" aria-current="page">Terms</a>
+      </nav>
+      <p>© 2026 MicMorph. All rights reserved.</p>
     </div>
   </footer>
+
   <script>
-    const themeToggle = document.getElementById("theme-toggle");
-    const themeIcon = themeToggle.querySelector(".theme-icon");
-    const html = document.documentElement;
+  (() => {
+    'use strict';
+    const root = document.documentElement;
 
-    function syncIcon() {
-      const isLight = html.getAttribute("data-theme") === "light";
-      themeIcon.textContent = isLight ? "☀️" : "🌙";
-    }
-    syncIcon();
-
-    themeToggle.addEventListener("click", () => {
-      const isLight = html.getAttribute("data-theme") !== "dark";
-      const next = isLight ? "dark" : "light";
-      html.setAttribute("data-theme", next);
-      localStorage.setItem("micmorph-theme", next);
-      syncIcon();
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+      const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+      root.dataset.theme = next;
+      try { localStorage.setItem('mm-theme', next); } catch (e) {}
     });
+
+    // Nav border once scrolled, and highlight the section being read in the sidebar.
+    const nav = document.querySelector('.nav');
+    const tocLinks = Array.from(document.querySelectorAll('.toc a'));
+    const sections = tocLinks.map((a) => document.getElementById(a.hash.slice(1)));
+    let tick = 0;
+    function update() {
+      tick = 0;
+      nav.classList.toggle('scrolled', window.scrollY > 8);
+      const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+      let current = -1;
+      sections.forEach((s, i) => { if (s.getBoundingClientRect().top <= 140) current = i; });
+      if (atBottom) current = sections.length - 1;
+      tocLinks.forEach((a, i) => {
+        if (i === current) a.setAttribute('aria-current', 'true');
+        else a.removeAttribute('aria-current');
+      });
+    }
+    window.addEventListener('scroll', () => { if (!tick) tick = requestAnimationFrame(update); }, { passive: true });
+    update();
+  })();
   </script>
 </body>
 </html>
