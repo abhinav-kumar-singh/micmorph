@@ -737,6 +737,35 @@
     .faq-list p { margin: -4px 0 20px; max-width: 62ch; font-size: 15px; color: var(--text-2); }
     .faq-list a { color: var(--text); text-decoration: underline; text-decoration-color: var(--border-strong); text-underline-offset: 3px; }
 
+    /* Contact & feedback */
+    .contact-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 64px; align-items: start; }
+    .contact-grid .section-head { position: sticky; top: 112px; margin-bottom: 0; }
+    .contact-card { padding: 32px; background: var(--surface); border: 1px solid var(--border-strong); border-radius: 16px; }
+    .contact-form { display: grid; gap: 18px; }
+    .contact-field { display: grid; gap: 7px; }
+    .contact-field label { font-size: 13px; font-weight: 500; color: var(--text); }
+    .contact-field input, .contact-field select, .contact-field textarea {
+      width: 100%; padding: 11px 12px; border: 1px solid var(--border-strong); border-radius: 9px;
+      background: var(--bg-elev); color: var(--text); font: inherit; font-size: 14px;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .contact-field textarea { min-height: 132px; resize: vertical; line-height: 1.5; }
+    .contact-field input::placeholder, .contact-field textarea::placeholder { color: var(--text-3); }
+    .contact-field input:focus, .contact-field select:focus, .contact-field textarea:focus {
+      border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px var(--glow);
+    }
+    .contact-meta { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 2px; }
+    .contact-note, .contact-status { margin: 0; font-size: 12px; color: var(--text-3); }
+    .contact-status { min-height: 18px; color: var(--success); }
+    .contact-status.is-error { color: #f87171; }
+
+    /* Product Hunt social proof */
+    .product-hunt-badge { display: inline-flex; margin-top: 20px; }
+    .product-hunt-badge img { display: block; width: 250px; height: 54px; }
+    .product-hunt-badge .ph-light { display: none; }
+    [data-theme="light"] .product-hunt-badge .ph-dark { display: none; }
+    [data-theme="light"] .product-hunt-badge .ph-light { display: block; }
+
     /* Closing call to action */
     .cta { position: relative; isolation: isolate; overflow: hidden; padding: 128px 0; border-top: 1px solid var(--border); text-align: center; }
     .cta::before {
@@ -851,8 +880,12 @@
       .privacy { grid-template-columns: minmax(0, 1fr); gap: 40px; padding: 40px; }
       .split { grid-template-columns: minmax(0, 1fr); gap: 40px; }
       .split .section-head { position: static; }
+      .contact-grid .section-head { position: static; }
     }
     @media (max-width: 720px) {
+      .contact-grid { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+      .contact-card { padding: 24px; }
+      .contact-meta { align-items: flex-start; flex-direction: column-reverse; }
       .flow { flex-direction: column; }
       .flow-step { width: 100%; }
       .step { padding: 16px 0 0; }
@@ -932,6 +965,7 @@
         <a href="#features">Features</a>
         <a href="#pricing">Pricing</a>
         <a href="#faq">FAQ</a>
+        <a href="#contact">Contact</a>
       </nav>
       <div class="nav-actions">
         <button class="icon-btn" id="theme-toggle" type="button" aria-label="Toggle light and dark theme">
@@ -951,6 +985,7 @@
         <a href="#features">Features</a>
         <a href="#pricing">Pricing</a>
         <a href="#faq">FAQ</a>
+        <a href="#contact">Contact</a>
         <a class="btn btn-primary" href="#install">Get MicMorph</a>
       </div>
     </nav>
@@ -1000,8 +1035,11 @@
             <p class="sr-only" id="copy-status" aria-live="polite"></p>
           </div>
 
-          <!-- Rounded down on purpose: 114 downloads as of Oct 2026. Bump at 250 / 500 / 1,000. -->
-          <p class="proof fade" style="--d:4"><svg class="icon"><use href="#i-download"/></svg><span><strong>100+ downloads</strong> during early access</span></p>
+          <p class="proof fade" style="--d:4"><svg class="icon"><use href="#i-download"/></svg><span><strong>300+ downloads</strong> during early access</span></p>
+          <a class="product-hunt-badge fade" style="--d:5" href="https://www.producthunt.com/products/micmorph?embed=true&amp;utm_source=badge-featured&amp;utm_medium=badge&amp;utm_campaign=badge-micmorph" target="_blank" rel="noopener noreferrer" aria-label="MicMorph on Product Hunt">
+            <img class="ph-light" alt="MicMorph - Free Real-Time Voice Changer for Google Meet &amp; Zoom | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1300365&amp;theme=light&amp;t=1794064779254">
+            <img class="ph-dark" alt="MicMorph - Free Real-Time Voice Changer for Google Meet &amp; Zoom | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1300365&amp;theme=dark&amp;t=1794064844388">
+          </a>
         </div>
 
         <div class="hero-visual fade" style="--d:2">
@@ -1426,6 +1464,42 @@
       </div>
     </section>
 
+    <!-- ── Contact & feedback ───────────────────────────────────────────── -->
+    <section class="section" id="contact" aria-labelledby="contact-title">
+      <div class="container contact-grid">
+        <div class="section-head reveal">
+          <h2 id="contact-title">Tell us what you think.</h2>
+          <p>Found a bug, have a feature idea, or just want to share how MicMorph is working for you? We’d love to hear it.</p>
+        </div>
+        <div class="contact-card reveal">
+          <form class="contact-form" action="https://formspree.io/f/xoeeznjl" method="POST" data-contact-form>
+            <div class="contact-field">
+              <label for="feedback-type">What would you like to share?</label>
+              <select id="feedback-type" name="feedback_type">
+                <option value="general">General feedback</option>
+                <option value="bug">Report a bug</option>
+                <option value="feature">Suggest a feature</option>
+                <option value="question">Ask a question</option>
+              </select>
+            </div>
+            <div class="contact-field">
+              <label for="feedback-message">Your message</label>
+              <textarea id="feedback-message" name="message" placeholder="Tell us what’s on your mind…" required></textarea>
+            </div>
+            <div class="contact-field">
+              <label for="feedback-email">Email</label>
+              <input id="feedback-email" name="email" type="email" placeholder="you@example.com" autocomplete="email" required>
+            </div>
+            <div class="contact-meta">
+              <p class="contact-note">We’ll only use your email to reply.</p>
+              <button class="btn btn-primary" type="submit">Send feedback <svg class="icon"><use href="#i-arrow-right"/></svg></button>
+            </div>
+            <p class="contact-status" data-contact-status role="status" aria-live="polite"></p>
+          </form>
+        </div>
+      </div>
+    </section>
+
     <!-- ── Closing call to action ───────────────────────────────────────── -->
     <section class="cta" aria-labelledby="cta-title">
       <div class="container reveal">
@@ -1461,6 +1535,7 @@
               <li><a href="#features">Features</a></li>
               <li><a href="#pricing">Pricing</a></li>
               <li><a href="#faq">FAQ</a></li>
+              <li><a href="#contact">Contact</a></li>
             </ul>
           </div>
           <div>
@@ -1894,6 +1969,34 @@
     $$('.faq-list details').forEach((d) => d.addEventListener('toggle', () => {
       if (d.open) track('faq_opened', { question: d.querySelector('summary').textContent.trim() });
     }));
+
+    const contactForm = $('[data-contact-form]');
+    if (contactForm) {
+      const contactStatus = $('[data-contact-status]');
+      contactForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const submitButton = contactForm.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+        contactStatus.textContent = 'Sending…';
+        contactStatus.classList.remove('is-error');
+        try {
+          const response = await fetch(contactForm.action, {
+            method: 'POST',
+            body: new FormData(contactForm),
+            headers: { Accept: 'application/json' }
+          });
+          if (!response.ok) throw new Error('Submission failed');
+          contactForm.reset();
+          contactStatus.textContent = 'Thanks — your feedback has been sent.';
+          track('feedback_submitted');
+        } catch (error) {
+          contactStatus.textContent = 'Something went wrong. Please try again.';
+          contactStatus.classList.add('is-error');
+        } finally {
+          submitButton.disabled = false;
+        }
+      });
+    }
   })();
   </script>
 </body>
